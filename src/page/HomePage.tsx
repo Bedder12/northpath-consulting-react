@@ -6,7 +6,7 @@ import TestimonialsSection from "../components/TestimonialsSection";
 
 export default function Home() {
   return (
-     <div className="font-['Inter'] scroll-smooth">
+     <div className="scroll-smooth">
       <Hero />
       <AudienceTabs />
       <Services />

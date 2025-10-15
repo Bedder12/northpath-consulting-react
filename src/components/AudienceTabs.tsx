@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import kompetens from "../assets/kompetens.webp"
+import konsult from "../assets/konsult.jpeg"
+import student from "../assets/student.jpeg"
 
 type Tab = {
   id: string;
@@ -12,24 +15,27 @@ type Tab = {
 const tabs: Tab[] = [
   {
     id: "companies",
-    label: "För företag",
+    label: "För Företag",
     heading: "Rätt kompetens när ni behöver den",
     text: "Vi hjälper företag att hitta erfarna konsulter och rekryteringslösningar som skapar trygghet och tillväxt.",
-    image: "/images/company.jpg",
+    image: kompetens,
+
+    
+
   },
   {
     id: "consultants",
-    label: "För konsulter",
+    label: "För Konsulter",
     heading: "Uppdrag som utvecklar",
     text: "Som konsult hos North Path får du uppdrag som matchar din kompetens och dina ambitioner – både korta och långsiktiga.",
-    image: "/images/consultant.jpg",
+    image: konsult,
   },
   {
     id: "candidates",
-    label: "För kandidater",
+    label: "För Kandidater",
     heading: "Din karriärresa börjar här",
     text: "Vi matchar dig med rätt möjligheter och ger stöd hela vägen från ansökan till första dagen på nya jobbet.",
-    image: "/images/candidate.jpg",
+    image: student,
   },
 ];
 

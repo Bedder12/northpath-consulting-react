@@ -1,39 +1,55 @@
-import { useEffect } from "react";
-import feather from "feather-icons";
+import { motion } from "framer-motion";
 
 export default function WhyChooseUs() {
-  useEffect(() => {
-    feather.replace();
-  }, []);
-
   const cards = [
-    { icon: "users", title: "Right Expertise", desc: "Our consultants are carefully selected and matched to fit your specific needs." },
-    { icon: "trending-up", title: "Measurable Results", desc: "We focus on turning strategy into action and creating value in practice." },
-    { icon: "handshake", title: "Long-term Partnership", desc: "We build long-term relationships and support customers throughout the journey." },
+    {
+      title: "Rätt kompetens vid rätt tidpunkt",
+      desc: "Våra konsulter är noggrant utvalda för att matcha just era behov – både strategiskt och operativt.",
+      icon: "👥",
+    },
+    {
+      title: "Resultat som märks",
+      desc: "Vi omvandlar strategi till handling och levererar värde som syns i praktiken.",
+      icon: "📈",
+    },
+    {
+      title: "Ett partnerskap som håller",
+      desc: "Vi bygger långsiktiga relationer och finns med som stöd genom hela resan.",
+      icon: "🤝",
+    },
   ];
 
   return (
-    <section className="py-20 bg-white text-center" id="about">
+    <section className="py-20 bg-blue-50 text-center">
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-blue-600 font-semibold uppercase">WHY CHOOSE US</h2>
-        <p className="mt-2 text-3xl font-extrabold text-gray-900">The Right Expertise at the Right Time</p>
-        <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-          Finding the right consultant is about more than filling a role. It's about creating conditions for real success.
+        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          Därför väljer företag North Path Consulting
+        </h2>
+        <p className="text-gray-600 mb-12">
+          Att hitta rätt konsult handlar om mer än att fylla en roll. 
+          Det handlar om att skapa förutsättningar för verklig framgång.
         </p>
-        <div className="mt-16 grid md:grid-cols-3 gap-8">
-          {cards.map((c) => (
-            <div
-              key={c.title}
-              className="bg-gray-50 p-8 rounded-xl shadow-sm hover:shadow-lg transition-transform hover:-translate-y-1"
+        <div className="grid md:grid-cols-3 gap-8">
+          {cards.map((c, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: i * 0.15 }}
+              className="bg-white p-8 rounded-xl shadow-sm hover:shadow-lg transition transform hover:-translate-y-1"
             >
-              <div className="flex justify-center items-center h-12 w-12 bg-blue-600 text-white rounded-md mx-auto">
-                <i data-feather={c.icon}></i>
-              </div>
-              <h3 className="mt-6 text-lg font-semibold text-gray-900">{c.title}</h3>
-              <p className="mt-2 text-gray-600">{c.desc}</p>
-            </div>
+              <div className="text-5xl mb-4">{c.icon}</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">{c.title}</h3>
+              <p className="text-gray-600 leading-relaxed">{c.desc}</p>
+            </motion.div>
           ))}
         </div>
+        <a
+          href="#contact"
+          className="inline-block mt-12 bg-blue-600 text-white px-8 py-3 rounded-md font-medium hover:bg-blue-700 transition"
+        >
+          Låt oss ta första steget tillsammans
+        </a>
       </div>
     </section>
   );

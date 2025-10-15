@@ -1,22 +1,30 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Services() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const services = [
     {
       title: "Långsiktiga uppdrag (Interim)",
       desc: "För företag som behöver en stabil resurs under en längre period. Våra konsulter bidrar kontinuerligt med kompetens och trygghet, vilket skapar stabilitet och tid för utveckling.",
-      image: "/images/interim.jpg",
+      image:
+       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=60" , // affärssamarbete
     },
     {
       title: "Kortare uppdrag (Projekt & specialiststöd)",
       desc: "När det behövs spetskompetens för en specifik utmaning eller ett tydligt avgränsat projekt. Våra konsulter kan snabbt sätta sig in i situationen och driva arbetet i mål.",
-      image: "/images/project.jpg",
+      image:
+         "https://images.unsplash.com/photo-1556761175-129418cb2dfe?auto=format&fit=crop&w=900&q=60", // projektteam
     },
     {
       title: "Rekrytering / Direktmatchning",
       desc: "För företag som söker rätt ekonom att anställa permanent – och för ekonomer som söker rätt företag. Vi ser till att matchningen blir hållbar över tid, där kompetens och kultur passar perfekt ihop.",
-      image: "/images/recruitment.jpg",
+      image:
+        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=60", // intervju / rekrytering
     },
   ];
 

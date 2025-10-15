@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react"; // nice icons (install via: npm install lucide-react)
+import { Menu, X } from "lucide-react"; // ikoner (npm install lucide-react)
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -9,12 +9,15 @@ export default function Navbar() {
     <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          {/* Logo */}
-          <Link to="/" className="flex items-center text-blue-600 font-bold text-xl">
-            North Path
+          {/* 🔹 Logo */}
+          <Link
+            to="/"
+            className="flex items-center text-blue-600 font-bold text-xl"
+          >
+            NorthPath Consulting
           </Link>
 
-          {/* Desktop menu */}
+          {/* 🔹 Desktop menu */}
           <div className="hidden sm:flex space-x-8">
             <Link
               to="/"
@@ -35,6 +38,12 @@ export default function Navbar() {
               Tjänster
             </Link>
             <Link
+              to="/upload-cv"
+              className="text-gray-700 hover:text-blue-600 font-medium transition"
+            >
+              Jobba med oss
+            </Link>
+            <Link
               to="/contact"
               className="text-gray-700 hover:text-blue-600 font-medium transition"
             >
@@ -42,7 +51,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Book a meeting button */}
+          {/* 🔹 CTA button */}
           <div className="hidden sm:flex items-center">
             <Link
               to="/contact"
@@ -52,7 +61,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile menu toggle */}
+          {/* 🔹 Mobile menu toggle */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="sm:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
@@ -62,7 +71,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* 🔹 Mobile dropdown */}
       {menuOpen && (
         <div className="sm:hidden bg-white border-t border-gray-200 shadow-md">
           <div className="px-4 py-4 space-y-2">
@@ -88,11 +97,11 @@ export default function Navbar() {
               Tjänster
             </Link>
             <Link
-              to="/cases"
+              to="/upload-cv"
               onClick={() => setMenuOpen(false)}
               className="block text-gray-700 hover:text-blue-600 font-medium"
             >
-              Kundcase
+              Jobba med oss
             </Link>
             <Link
               to="/contact"

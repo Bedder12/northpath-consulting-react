@@ -1,10 +1,16 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar.tsx";
-import Footer from "./components/Footer.tsx";
-import Home from "./page/HomePage.tsx";
-import About from "./page/About.tsx";
-import Services from "./page/Services.tsx";  // ✅ Add this import
+import Navbar from "./components/Navbar.jsx";
+import Footer from "./components/Footer.jsx";
+import Home from "./page/HomePage.jsx";
+import About from "./page/About.jsx";
+import Services from "./page/Services.jsx";
+import Contact from "./page/Contact.jsx";
 
+// 🔹 Admin Pages (endast en import per komponent)
+import AdminLogin from "./page/AdminLogin.jsx";
+import AdminDashboard from "./page/AdminDashboard.jsx";
+import ApplicationsAdmin from "./page/ApplicationsAdmin.jsx";
+import ContactsAdmin from "./page/ContactsAdmin.jsx";
 
 export default function App() {
   return (
@@ -12,12 +18,19 @@ export default function App() {
       <Navbar />
       <main className="pt-20">
         <Routes>
+          {/* Vanliga sidor */}
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} /> 
-          <Route path="/services" element={<Services />} /> 
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/contact" element={<Contact />} />
+
+          {/* Admin */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/applications" element={<ApplicationsAdmin />} />
+          <Route path="/admin/contacts" element={<ContactsAdmin />} />
         </Routes>
       </main>
-
       <Footer />
     </BrowserRouter>
   );
