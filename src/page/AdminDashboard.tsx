@@ -1,48 +1,52 @@
-import { useNavigate, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
+import { useNavigate } from "react-router-dom";
+import AdminSidebar from "../components/AdminSidebar";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const isAuth = localStorage.getItem("northpath_admin");
-    if (!isAuth) navigate("/admin/login");
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      const session = data?.session;
+      if (!session) {
+        navigate("/admin/login");
+        return;
+      }
+      setAdminEmail(session.user.email);
+      if (session.user.email !== "admin@northpath.se") navigate("/");
+    }
+    checkSession();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("northpath_admin");
-    navigate("/admin/login");
-  };
-
   return (
-    <section className="min-h-screen bg-gray-50 py-16">
-      <div className="max-w-3xl mx-auto bg-white p-10 rounded-xl shadow-md text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          NorthPath Adminpanel
+    <div className="flex">
+      <AdminSidebar />
+      <main className="flex-1 ml-64 bg-gray-50 min-h-screen p-10">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Välkommen till Adminpanelen
         </h1>
+        {adminEmail && (
+          <p className="text-sm text-gray-600 mb-8">
+            Inloggad som <span className="font-medium text-blue-700">{adminEmail}</span>
+          </p>
+        )}
 
-        <div className="flex flex-col sm:flex-row justify-center gap-6 mb-8">
-          <Link
-            to="/admin/applications"
-            className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition"
-          >
-            👔 Kandidatansökningar
-          </Link>
-          <Link
-            to="/admin/contacts"
-            className="bg-green-600 text-white px-6 py-3 rounded-md font-medium hover:bg-green-700 transition"
-          >
-            🏢 Företagsförfrågningar
-          </Link>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Snabböversikt
+            </h2>
+            <p className="text-gray-600">Hantera alla inkommande ansökningar och kontakter i menyn.</p>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Tips</h2>
+            <p className="text-gray-600">Du kan växla mellan sidorna i sidomenyn.</p>
+          </div>
         </div>
-
-        <button
-          onClick={handleLogout}
-          className="text-sm text-gray-500 hover:text-red-600 transition"
-        >
-          Logga ut
-        </button>
-      </div>
-    </section>
+      </main>
+    </div>
   );
 }

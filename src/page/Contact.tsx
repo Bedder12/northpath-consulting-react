@@ -2,7 +2,6 @@ import { useState } from "react";
 import { supabase } from "../supabaseClient";
 
 export default function Contact() {
-  // Form states
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,7 +13,6 @@ export default function Contact() {
   const [error, setError] = useState("");
   const [showCVModal, setShowCVModal] = useState(false);
 
-  // CV form
   const [cvData, setCvData] = useState({
     name: "",
     email: "",
@@ -24,11 +22,10 @@ export default function Contact() {
   const [file, setFile] = useState<File | null>(null);
   const [uploadMsg, setUploadMsg] = useState("");
 
-  // Handle contact form change
+  // 🔹 Kontaktformulär
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // Handle contact submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
@@ -36,14 +33,7 @@ export default function Contact() {
     setError("");
 
     try {
-      const { error } = await supabase.from("contacts").insert([
-        {
-          name: formData.name,
-          email: formData.email,
-          company: formData.company,
-          message: formData.message,
-        },
-      ]);
+      const { error } = await supabase.from("contacts").insert([formData]);
       if (error) throw error;
 
       setSuccess("Tack! Ditt meddelande har skickats.");
@@ -56,7 +46,7 @@ export default function Contact() {
     }
   };
 
-  // CV upload
+  // 🔹 CV-formulär
   const handleCvChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setCvData({ ...cvData, [e.target.name]: e.target.value });
 
@@ -78,13 +68,7 @@ export default function Contact() {
       const fileUrl = publicUrl?.publicUrl;
 
       const { error: insertError } = await supabase.from("applications").insert([
-        {
-          name: cvData.name,
-          email: cvData.email,
-          linkedin: cvData.linkedin,
-          about: cvData.about,
-          file_url: fileUrl,
-        },
+        { ...cvData, file_url: fileUrl },
       ]);
       if (insertError) throw insertError;
 
@@ -98,18 +82,18 @@ export default function Contact() {
   };
 
   return (
-    <section className="bg-white text-gray-800 py-20 min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-start">
-        {/* Left info */}
-        <div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+    <section className="bg-white text-gray-800 py-16 px-4 sm:px-6 min-h-screen">
+      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-start">
+        {/* 🧭 Vänster sektion */}
+        <div className="text-center md:text-left">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Låt oss ta första steget tillsammans
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 max-w-md mx-auto md:mx-0">
             Fyll i formuläret så kontaktar vi dig inom kort – eller skicka in din ansökan direkt.
           </p>
 
-          <div className="space-y-2 mb-8">
+          <div className="space-y-2 mb-8 text-sm sm:text-base">
             <p>
               <strong>Telefon:</strong>{" "}
               <a href="tel:+46701234567" className="text-blue-600 hover:underline">
@@ -136,22 +120,22 @@ export default function Contact() {
 
           <button
             onClick={() => setShowCVModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition w-full sm:w-auto"
           >
             Skicka din ansökan
           </button>
         </div>
 
-        {/* Contact form */}
+        {/* 🧠 Kontaktformulär */}
         <form
           onSubmit={handleSubmit}
-          className="bg-blue-950 text-white rounded-xl p-8 shadow-xl space-y-4"
+          className="bg-blue-950 text-white rounded-xl p-6 sm:p-8 shadow-xl space-y-4"
         >
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="text"
               name="name"
-              placeholder="Förnamn*"
+              placeholder="Namn*"
               value={formData.name}
               onChange={handleChange}
               required
@@ -167,6 +151,7 @@ export default function Contact() {
               className="p-3 rounded-md text-gray-900 w-full"
             />
           </div>
+
           <input
             type="text"
             name="company"
@@ -180,9 +165,10 @@ export default function Contact() {
             placeholder="Meddelande"
             value={formData.message}
             onChange={handleChange}
-            className="p-3 rounded-md text-gray-900 w-full h-28"
             required
+            className="p-3 rounded-md text-gray-900 w-full h-28"
           ></textarea>
+
           <button
             type="submit"
             disabled={sending}
@@ -196,9 +182,9 @@ export default function Contact() {
         </form>
       </div>
 
-      {/* ✅ CV-popup */}
+      {/* 💼 CV-popup */}
       {showCVModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative animate-fade-in">
             <button
               onClick={() => setShowCVModal(false)}
@@ -206,6 +192,7 @@ export default function Contact() {
             >
               &times;
             </button>
+
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
               Skicka in din ansökan
             </h3>

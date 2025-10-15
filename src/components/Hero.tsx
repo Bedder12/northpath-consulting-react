@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { supabase } from "../supabaseClient";
-import office from "../assets/office.webp"; // behåll din bild
+import office from "../assets/office.webp";
 
 export default function Hero() {
   const [showModal, setShowModal] = useState(false);
@@ -36,20 +36,20 @@ export default function Hero() {
       setLoading(true);
       setMessage("");
 
-      // 🧩 1. Ladda upp CV till Supabase Storage
+      // 1️⃣ Ladda upp CV till Supabase Storage
       const filePath = `cvs/${Date.now()}_${file.name}`;
       const { error: uploadError } = await supabase.storage
         .from("cvs")
         .upload(filePath, file);
       if (uploadError) throw uploadError;
 
-      // 🧩 2. Hämta offentlig URL till filen
+      // 2️⃣ Hämta offentlig URL
       const { data: publicData } = supabase.storage
         .from("cvs")
         .getPublicUrl(filePath);
       const fileUrl = publicData?.publicUrl;
 
-      // 🧩 3. Spara ansökan i databasen
+      // 3️⃣ Spara ansökan i databasen
       const { error: insertError } = await supabase.from("applications").insert([
         {
           name: formData.name,
@@ -74,28 +74,25 @@ export default function Hero() {
 
   return (
     <section className="bg-gradient-to-tr from-sky-100 to-green-50 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 py-20 md:py-32 grid lg:grid-cols-2 gap-8 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-28 grid lg:grid-cols-2 gap-10 items-center text-center lg:text-left">
         {/* 🧠 Textdel */}
         <div>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">
             Vi hjälper företag att navigera genom förändring och växa hållbart.
           </h1>
-          <p className="mt-4 text-lg text-gray-600 max-w-md">
+          <p className="mt-4 text-lg text-gray-600 max-w-md mx-auto lg:mx-0">
             På North Path Consulting erbjuder vi erfarna konsulter inom ekonomi
             och verksamhetsutveckling – flexibla lösningar för rätt kompetens i
             rätt tid.
           </p>
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-4">
-            {/* Boka möte */}
+          <div className="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
             <a
               href="/contact"
               className="bg-blue-600 text-white px-8 py-3 rounded-md font-medium hover:bg-blue-700 transition"
             >
               Boka ett möte
             </a>
-
-            {/* Skicka ansökan */}
             <button
               onClick={() => setShowModal(true)}
               className="border border-blue-600 text-blue-600 bg-white px-8 py-3 rounded-md font-medium hover:bg-blue-50 transition"
@@ -105,7 +102,9 @@ export default function Hero() {
           </div>
 
           {message && (
-            <p className="mt-4 text-green-700 text-sm max-w-md">{message}</p>
+            <p className="mt-4 text-green-700 text-sm max-w-md mx-auto lg:mx-0">
+              {message}
+            </p>
           )}
         </div>
 
@@ -113,14 +112,14 @@ export default function Hero() {
         <img
           src={office}
           alt="Kontorsmiljö"
-          className="rounded-lg shadow-xl w-full object-cover h-[420px]"
+          className="rounded-xl shadow-xl w-full h-64 sm:h-80 md:h-[420px] object-cover"
         />
       </div>
 
       {/* ✅ Popup-modal för CV-uppladdning */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative mx-4 sm:mx-0">
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl"
