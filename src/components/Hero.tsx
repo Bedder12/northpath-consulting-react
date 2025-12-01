@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
-import { checkRateLimit } from "../utils/rateLimit";
-import office from "../assets/office.webp";
+import heroFallback from "../assets/office.webp";
 
 export default function Hero() {
   const [showModal, setShowModal] = useState(false);
@@ -31,13 +30,6 @@ export default function Hero() {
       return;
     }
 
-    // 🔥 RATE LIMIT
-    const rate = await checkRateLimit();
-    if (!rate.allowed) {
-      setMessage("För många försök. Försök igen om 1 timme.");
-      return;
-    }
-
     try {
       setLoading(true);
       setMessage("");
@@ -46,11 +38,13 @@ export default function Hero() {
       const { error: uploadError } = await supabase.storage
         .from("cvs")
         .upload(filePath, file);
+
       if (uploadError) throw uploadError;
 
       const { data: publicData } = supabase.storage
         .from("cvs")
         .getPublicUrl(filePath);
+
       const fileUrl = publicData?.publicUrl;
 
       const { error: insertError } = await supabase.from("applications").insert([
@@ -62,11 +56,14 @@ export default function Hero() {
           file_url: fileUrl,
         },
       ]);
+
       if (insertError) throw insertError;
 
       setMessage("Tack! Din ansökan har skickats.");
       setFormData({ name: "", email: "", linkedin: "", about: "" });
       setFile(null);
+
+      setTimeout(() => setShowModal(false), 1500);
     } catch (err) {
       console.error(err);
       setMessage("Ett fel uppstod. Försök igen.");
@@ -76,109 +73,106 @@ export default function Hero() {
   };
 
   return (
-    <section className="bg-gradient-to-tr from-sky-100 to-green-50 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-28 grid lg:grid-cols-2 gap-10 items-center text-center lg:text-left">
-        <div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">
-            Vi hjälper företag att navigera genom förändring och växa hållbart.
+    <section className="relative h-[80vh] w-full overflow-hidden">
+
+      {/* FALLBACK IMAGE (under videon) */}
+      <img
+        src={heroFallback}
+        alt="NorthPath Consulting"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+
+      {/* VIDEO ALWAYS ACTIVE */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+      >
+        <source src="/video/office.mp4" type="video/mp4" />
+      </video>
+
+      {/* UNIFIED GRADIENT (works on ALL screen sizes) */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-900/40 to-transparent"></div>
+
+      {/* CONTENT */}
+      <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col justify-center gap-10 md:flex-row md:items-center">
+
+        {/* LEFT TEXT */}
+        <div className="flex-1 text-center md:text-left animate-fade">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight text-white">
+            Hyr rätt kompetens.
+            <span className="block text-blue-300">
+              Bygg framtidens organisation.
+            </span>
           </h1>
-          <p className="mt-4 text-lg text-gray-600 max-w-md mx-auto lg:mx-0">
-            På North Path Consulting erbjuder vi erfarna konsulter inom ekonomi,
-            verksamhetsutveckling och IT – flexibla lösningar för rätt kompetens.
+
+          <p className="mt-6 text-lg max-w-xl text-blue-100">
+            North Path Consulting hjälper företag växa genom smarta, hållbara och
+            flexibla konsult- och rekryteringslösningar inom IT, ekonomi och
+            verksamhetsutveckling.
           </p>
 
-          <div className="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+          {/* CTA BUTTONS */}
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 md:justify-start justify-center">
+
             <a
               href="/contact"
-              className="bg-blue-600 text-white px-8 py-3 rounded-md font-medium hover:bg-blue-700 transition"
+              className="bg-blue-700 text-white px-8 py-4 rounded-lg shadow-md hover:bg-blue-800 transition font-medium text-lg"
             >
               Boka ett möte
             </a>
+
             <button
               onClick={() => setShowModal(true)}
-              className="border border-blue-600 text-blue-600 bg-white px-8 py-3 rounded-md font-medium hover:bg-blue-50 transition"
+              className="border border-blue-200 text-blue-100 bg-transparent px-8 py-4 rounded-lg hover:bg-blue-800/40 transition font-medium text-lg"
             >
-              Skicka in din ansökan
+              Ladda upp ditt CV
             </button>
           </div>
-
-          {message && (
-            <p className="mt-4 text-green-700 text-sm max-w-md mx-auto lg:mx-0">
-              {message}
-            </p>
-          )}
         </div>
-
-        <img
-          src={office}
-          alt="Kontorsmiljö"
-          className="rounded-xl shadow-xl w-full h-64 sm:h-80 md:h-[420px] object-cover"
-        />
       </div>
 
-      {/* CV Modal */}
+      {/* CV MODAL */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-3 right-3 text-gray-500 text-xl"
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl"
             >
-              &times;
+              ×
             </button>
 
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-              Skicka in din ansökan
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Ladda upp ditt CV
             </h3>
 
-            <form onSubmit={handleSubmit} className="space-y-3 text-left">
-              <input
-                type="text"
-                name="name"
-                placeholder="Namn"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="E-post"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
-              />
-              <textarea
-                name="about"
-                placeholder="Berätta kort om dig själv"
-                value={formData.about}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 h-24"
-              />
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={handleFileChange}
-                required
-                className="block w-full border border-gray-300 rounded-md cursor-pointer"
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-600 text-white py-2 rounded-md"
-              >
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input type="text" name="name" placeholder="Namn" value={formData.name} onChange={handleChange} required className="w-full border rounded-md px-3 py-2" />
+
+              <input type="email" name="email" placeholder="E-post" value={formData.email} onChange={handleChange} required className="w-full border rounded-md px-3 py-2" />
+
+              <input type="url" name="linkedin" placeholder="LinkedIn (valfritt)" value={formData.linkedin} onChange={handleChange} className="w-full border rounded-md px-3 py-2" />
+
+              <textarea name="about" placeholder="Kort beskrivning" value={formData.about} onChange={handleChange} className="w-full border rounded-md px-3 py-2 h-24"></textarea>
+
+              <input type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange} required className="w-full border rounded-md px-3 py-2 cursor-pointer" />
+
+              <button type="submit" disabled={loading} className="w-full bg-blue-700 text-white py-3 rounded-lg hover:bg-blue-800 transition font-semibold">
                 {loading ? "Skickar..." : "Skicka CV"}
               </button>
 
               {message && (
-                <p className="text-center text-gray-700 mt-2">{message}</p>
+                <p className="text-center text-sm mt-2 text-gray-700">{message}</p>
               )}
             </form>
           </div>
         </div>
       )}
+
     </section>
   );
 }

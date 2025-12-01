@@ -1,56 +1,37 @@
-import { motion } from "framer-motion";
-
-const testimonials = [
-  {
-    quote: "Det viktiga var att han skulle förstå vårt behov och vad vi söker. Vi fick rätt person på plats och ett otroligt engagemang.",
-    name: "Frida Dunger",
-    company: "Emmaus",
-  },
-  {
-    quote: "Sabina var superproffsig och gav mig allt jag behövde för att känna mig trygg under hela processen.",
-    name: "Paulia Robinson",
-    company: "Veidekke",
-  },
-  {
-    quote: "Jag upplevde samarbetet som väldigt bra. Anette och Rise var professionella och effektiva genom hela processen.",
-    name: "Margaret Simonson McNamee",
-    company: "Rise",
-  },
-];
-
 export default function TestimonialsSection() {
-  return (
-    <section className="bg-blue-50 py-20">
-      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
-        <div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Snacka om att ha roligt på jobbet!
-          </h2>
-          <p className="text-gray-700 mb-6">
-            Vi har över 1 600 nöjda kunder – här är ett urval av deras upplevelser.
-          </p>
-          <a
-            href="#contact"
-            className="inline-block border border-blue-700 text-blue-700 px-6 py-3 rounded-md hover:bg-blue-700 hover:text-white transition"
-          >
-            LÄS MER
-          </a>
-        </div>
+  const testimonials = [
+    {
+      name: "Anna Eriksson",
+      role: "CFO, NordTech AB",
+      text: "NorthPath hjälpte oss hitta rätt kompetens extremt snabbt. Professionella, tydliga och effektiva.",
+    },
+    {
+      name: "Johan Lind",
+      role: "CTO, Atlas Group",
+      text: "Deras konsulter levererade mer än vad vi hade förväntat oss. Rekommenderas starkt.",
+    },
+    {
+      name: "Sara Holm",
+      role: "HR-chef, Vectra",
+      text: "Vi har samarbetat med NorthPath för både rekrytering och konsultlösningar – toppklass.",
+    }
+  ];
 
-        <div className="space-y-6">
+  return (
+    <section className="bg-white py-20">
+      <div className="max-w-7xl mx-auto px-6 text-center">
+        <h2 className="text-3xl font-bold mb-10">Vad våra kunder säger</h2>
+
+        <div className="grid md:grid-cols-3 gap-10">
           {testimonials.map((t, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: i * 0.15 }}
-              className="bg-white rounded-lg shadow p-6 relative"
+              className="bg-gray-50 p-6 rounded-xl shadow border border-gray-200"
             >
-              <span className="absolute -top-4 left-4 text-blue-600 text-5xl font-serif">“</span>
-              <p className="text-gray-700 mb-4 italic">{t.quote}</p>
-              <p className="font-semibold text-gray-900">{t.name}</p>
-              <p className="text-sm text-gray-500">{t.company}</p>
-            </motion.div>
+              <p className="text-gray-700 italic mb-4">“{t.text}”</p>
+              <h4 className="font-semibold">{t.name}</h4>
+              <p className="text-gray-600 text-sm">{t.role}</p>
+            </div>
           ))}
         </div>
       </div>

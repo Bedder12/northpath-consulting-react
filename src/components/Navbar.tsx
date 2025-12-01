@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../supabaseClient";
 import type { Session } from "@supabase/supabase-js";
 
@@ -9,6 +10,10 @@ export default function Navbar() {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  const [companyOpen, setCompanyOpen] = useState(false);
+  const [candidateOpen, setCandidateOpen] = useState(false);
+
+  // Load Supabase session
   useEffect(() => {
     const loadSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -22,13 +27,12 @@ export default function Navbar() {
           .single();
 
         setIsAdmin(!!allowed);
-      } else {
-        setIsAdmin(false);
       }
     };
 
     loadSession();
 
+    // Listen to auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
       loadSession();
     });
@@ -42,92 +46,243 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white/90 backdrop-blur-md shadow-sm fixed w-full top-0 z-50 border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16 items-center">
 
-        {/* LOGO */}
-        <Link
-          to="/"
-          className="text-2xl font-extrabold text-blue-700 tracking-tight"
-        >
-          NorthPath
-        </Link>
+          {/* LOGO */}
+          <Link to="/" className="text-blue-600 font-bold text-xl">
+            NorthPath Consulting
+          </Link>
 
-        {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
-          <Link to="/" className="hover:text-blue-600">Hem</Link>
-          <Link to="/about" className="hover:text-blue-600">Om oss</Link>
-          <Link to="/services" className="hover:text-blue-600">Tjänster</Link>
-          <Link to="/upload-cv" className="hover:text-blue-600">Jobba med oss</Link>
-          <Link to="/contact" className="hover:text-blue-600">Kontakt</Link>
+          {/* DESKTOP MENU */}
+          <div className="hidden sm:flex space-x-8 items-center">
 
-          {isAdmin ? (
-            <Link to="/admin/dashboard" className="text-blue-700 font-semibold">
-              Adminpanel
+            <Link to="/" className="text-gray-700 hover:text-blue-600">
+              Hem
             </Link>
-          ) : (
-            <Link to="/admin/login" className="hover:text-blue-600">
-              Admin
-            </Link>
-          )}
 
-          {session && (
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm"
+            {/* DROPDOWN – Företag */}
+            <div
+              className="relative"
+              onMouseEnter={() => setCompanyOpen(true)}
+              onMouseLeave={() => setCompanyOpen(false)}
             >
-              <LogOut size={16} />
-              Logga ut
-            </button>
-          )}
-        </div>
+              <button className="flex items-center gap-1 text-gray-700 hover:text-blue-600">
+                För företag <ChevronDown size={16} />
+              </button>
 
-        {/* MOBILE MENU BUTTON */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
-        >
-          {menuOpen ? <X size={26} /> : <Menu size={26} />}
-        </button>
-      </div>
+              <AnimatePresence>
+                {companyOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg py-3 z-50"
+                  >
+                    <Link to="/services" className="block px-4 py-2 hover:bg-gray-100">
+                      Konsultuthyrning
+                    </Link>
 
-      {/* MOBILE MENU */}
-      {menuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 shadow-sm animate-fade">
-          <div className="px-6 py-5 flex flex-col gap-4 text-gray-700 text-lg font-medium">
+                    <Link to="/services" className="block px-4 py-2 hover:bg-gray-100">
+                      Projekt & Specialiststöd
+                    </Link>
 
-            <Link to="/" onClick={() => setMenuOpen(false)}>Hem</Link>
-            <Link to="/about" onClick={() => setMenuOpen(false)}>Om oss</Link>
-            <Link to="/services" onClick={() => setMenuOpen(false)}>Tjänster</Link>
-            <Link to="/upload-cv" onClick={() => setMenuOpen(false)}>Jobba med oss</Link>
-            <Link to="/contact" onClick={() => setMenuOpen(false)}>Kontakt</Link>
+                    <Link to="/services" className="block px-4 py-2 hover:bg-gray-100">
+                      Rekrytering & Direktmatchning
+                    </Link>
 
+                    <Link
+                      to="/case-studies"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Case Studies
+                    </Link>
+
+                    <Link
+                      to="/clients"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Kundloggor
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* DROPDOWN – Jobbsökande */}
+            <div
+              className="relative"
+              onMouseEnter={() => setCandidateOpen(true)}
+              onMouseLeave={() => setCandidateOpen(false)}
+            >
+              <button className="flex items-center gap-1 text-gray-700 hover:text-blue-600">
+                Jobbsökande <ChevronDown size={16} />
+              </button>
+
+              <AnimatePresence>
+                {candidateOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute left-0 mt-2 w-64 bg-white shadow-lg rounded-lg py-3 z-50"
+                  >
+                    <Link
+                      to="/jobba-med-oss"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Jobba med oss
+                    </Link>
+
+                    <Link
+                      to="/jobba-med-oss#competences"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Våra kompetensområden
+                    </Link>
+
+                    <button
+                      onClick={() => setCandidateOpen(false)}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      <Link to="/jobba-med-oss#benefits">Fördelar & Trygghet</Link>
+                    </button>
+
+                    <Link
+                      to="/jobba-med-oss#process"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Så fungerar processen
+                    </Link>
+
+                    <Link
+                      to="/jobba-med-oss#faq"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Vanliga frågor
+                    </Link>
+
+                    <button
+                      className="block px-4 py-2 hover:bg-gray-100 text-left"
+                      onClick={() => setShowCVModal(true)}
+                    >
+                      Skicka CV
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <Link to="/contact" className="text-gray-700 hover:text-blue-600">
+              Kontakt
+            </Link>
+
+            {/* ADMIN */}
             {isAdmin ? (
               <Link
                 to="/admin/dashboard"
-                onClick={() => setMenuOpen(false)}
                 className="text-blue-700 font-semibold"
               >
                 Adminpanel
               </Link>
             ) : (
-              <Link
-                to="/admin/login"
-                onClick={() => setMenuOpen(false)}
-              >
+              <Link to="/admin/login" className="text-gray-700 hover:text-blue-600">
                 Admin
               </Link>
             )}
 
+            {/* LOGOUT */}
             {session && (
               <button
                 onClick={handleLogout}
-                className="text-left text-red-600 mt-3 flex items-center gap-2"
+                className="text-red-600 hover:text-red-700 text-sm ml-4"
               >
-                <LogOut size={18} /> Logga ut
+                Logga ut
               </button>
             )}
           </div>
+
+          {/* MOBILE MENU BUTTON */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="sm:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
+          >
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {/* MOBILE MENU */}
+      {menuOpen && (
+        <div className="sm:hidden bg-white border-t border-gray-200 shadow-md px-4 py-4 space-y-3">
+
+          <Link to="/" onClick={() => setMenuOpen(false)} className="block">
+            Hem
+          </Link>
+
+          <div className="border-t pt-3">
+            <p className="font-semibold text-gray-700">För företag</p>
+
+            <Link to="/services" className="block py-2" onClick={() => setMenuOpen(false)}>
+              Konsultuthyrning
+            </Link>
+
+            <Link to="/services" className="block py-2" onClick={() => setMenuOpen(false)}>
+              Projekt & Specialiststöd
+            </Link>
+
+            <Link to="/services" className="block py-2" onClick={() => setMenuOpen(false)}>
+              Rekrytering
+            </Link>
+
+            <Link to="/case-studies" className="block py-2" onClick={() => setMenuOpen(false)}>
+              Case Studies
+            </Link>
+
+            <Link to="/clients" className="block py-2" onClick={() => setMenuOpen(false)}>
+              Kundloggor
+            </Link>
+          </div>
+
+          <div className="border-t pt-3">
+            <p className="font-semibold text-gray-700">Jobbsökande</p>
+
+            <Link to="/jobba-med-oss" className="block py-2" onClick={() => setMenuOpen(false)}>
+              Jobba med oss
+            </Link>
+
+            <button
+              onClick={() => { setShowCVModal(true); setMenuOpen(false); }}
+              className="block py-2 text-left w-full"
+            >
+              Skicka CV
+            </button>
+
+            <Link to="/jobba-med-oss#competences" className="block py-2">Kompetensområden</Link>
+            <Link to="/jobba-med-oss#benefits" className="block py-2">Fördelar</Link>
+            <Link to="/jobba-med-oss#process" className="block py-2">Process</Link>
+            <Link to="/jobba-med-oss#faq" className="block py-2">FAQ</Link>
+          </div>
+
+          <Link to="/contact" className="block">Kontakt</Link>
+
+          {isAdmin ? (
+            <Link to="/admin/dashboard" className="block">Adminpanel</Link>
+          ) : (
+            <Link to="/admin/login" className="block">Admin</Link>
+          )}
+
+          {session && (
+            <button
+              onClick={handleLogout}
+              className="text-red-600 font-medium mt-2"
+            >
+              Logga ut
+            </button>
+          )}
         </div>
       )}
     </nav>

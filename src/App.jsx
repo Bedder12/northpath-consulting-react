@@ -5,6 +5,8 @@ import Home from "./page/HomePage.jsx";
 import About from "./page/About.jsx";
 import Services from "./page/Services.jsx";
 import Contact from "./page/Contact.jsx";
+import WorkWithUs from "./page/WorkWithUs.jsx";
+
 
 // 🔹 Admin Pages (endast en import per komponent)
 import AdminLogin from "./page/AdminLogin.jsx";
@@ -22,6 +24,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/jobba-med-oss" element={<WorkWithUs />} />
           <Route path="/contact" element={<Contact />} />
 
           {/* Admin */}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
 import { checkRateLimit } from "../utils/rateLimit";
+import { Phone, Mail, Building2, ArrowRight } from "lucide-react";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -9,11 +10,12 @@ export default function Contact() {
     company: "",
     message: "",
   });
+
   const [sending, setSending] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const [showCVModal, setShowCVModal] = useState(false);
 
+  const [showCVModal, setShowCVModal] = useState(false);
   const [cvData, setCvData] = useState({
     name: "",
     email: "",
@@ -23,18 +25,24 @@ export default function Contact() {
   const [file, setFile] = useState<File | null>(null);
   const [uploadMsg, setUploadMsg] = useState("");
 
-  // 🔹 Kontaktformulär
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  // --- INPUT HANDLERS ---
+  const handleChange = (e: any) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCvChange = (e: any) =>
+    setCvData({ ...cvData, [e.target.name]: e.target.value });
+
+  const handleFileChange = (e: any) =>
+    setFile(e.target.files?.[0] || null);
+
+  // --- CONTACT FORM SUBMIT ---
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setSending(true);
-    setSuccess("");
     setError("");
+    setSuccess("");
 
-    // 🔥 RATE LIMIT CHECK
+    // Rate limit
     const rate = await checkRateLimit();
     if (!rate.allowed) {
       setError("För många försök. Försök igen om 1 timme.");
@@ -46,32 +54,24 @@ export default function Contact() {
       const { error } = await supabase.from("contacts").insert([formData]);
       if (error) throw error;
 
-      setSuccess("Tack! Ditt meddelande har skickats.");
+      setSuccess("Tack! Vi hör av oss inom 24 timmar.");
       setFormData({ name: "", email: "", company: "", message: "" });
     } catch (err) {
-      console.error(err);
       setError("Ett fel uppstod. Försök igen senare.");
     } finally {
       setSending(false);
     }
   };
 
-  // 🔹 CV-formulär
-  const handleCvChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setCvData({ ...cvData, [e.target.name]: e.target.value });
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setFile(e.target.files?.[0] || null);
-
-  const handleCvSubmit = async (e: React.FormEvent) => {
+  // --- CV SUBMIT ---
+  const handleCvSubmit = async (e: any) => {
     e.preventDefault();
+
     if (!file) {
       setUploadMsg("Välj en fil först.");
       return;
     }
 
-    // 🔥 RATE LIMIT on CV form too
     const rate = await checkRateLimit();
     if (!rate.allowed) {
       setUploadMsg("För många försök. Försök igen om 1 timme.");
@@ -88,75 +88,112 @@ export default function Contact() {
       const { data: publicUrl } = supabase.storage
         .from("cvs")
         .getPublicUrl(filePath);
+
       const fileUrl = publicUrl?.publicUrl;
 
-      const { error: insertError } = await supabase.from("applications").insert([
-        { ...cvData, file_url: fileUrl },
-      ]);
+      const { error: insertError } = await supabase
+        .from("applications")
+        .insert([{ ...cvData, file_url: fileUrl }]);
+
       if (insertError) throw insertError;
 
-      setUploadMsg("CV uppladdat! Vi kontaktar dig snart.");
+      setUploadMsg("CV uppladdat! Vi hör av oss snart.");
       setCvData({ name: "", email: "", linkedin: "", about: "" });
       setFile(null);
     } catch (err) {
-      console.error(err);
       setUploadMsg("Fel vid uppladdning. Försök igen.");
     }
   };
 
   return (
-    <section className="bg-white text-gray-800 py-16 px-4 sm:px-6 min-h-screen">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-start">
-        {/* Left Section */}
-        <div className="text-center md:text-left">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Låt oss ta första steget tillsammans
+    <section className="bg-white min-h-screen py-16 px-4 sm:px-6">
+
+      {/* TITLE SECTION */}
+      <div className="text-center mb-16">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+          Kontakta oss
+        </h1>
+        <p className="text-gray-600 text-lg mt-4 max-w-2xl mx-auto">
+          Oavsett om du är ett företag som söker kompetens eller en kandidat som vill växa – vi finns här för att hjälpa dig vidare.
+        </p>
+      </div>
+
+      {/* CONTACT INFO BOXES */}
+      <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6 mb-16">
+        <div className="bg-blue-50 p-6 rounded-xl text-center shadow-sm">
+          <Phone className="mx-auto text-blue-700 mb-3" size={32} />
+          <p className="font-semibold text-gray-900">Telefon</p>
+          <p className="text-gray-700 text-sm mt-1">+46 (0)70 123 45 67</p>
+        </div>
+
+        <div className="bg-blue-50 p-6 rounded-xl text-center shadow-sm">
+          <Mail className="mx-auto text-blue-700 mb-3" size={32} />
+          <p className="font-semibold text-gray-900">E-post</p>
+          <p className="text-gray-700 text-sm mt-1">info@northpath.se</p>
+        </div>
+
+        <div className="bg-blue-50 p-6 rounded-xl text-center shadow-sm">
+          <Building2 className="mx-auto text-blue-700 mb-3" size={32} />
+          <p className="font-semibold text-gray-900">Företag</p>
+          <p className="text-gray-700 text-sm mt-1">
+            Stockholm • Remote
+          </p>
+        </div>
+      </div>
+
+      {/* MAIN CONTACT + CV CTA */}
+      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-start">
+
+        {/* LEFT — CTA & TEXT */}
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            För företag & kandidater
           </h2>
-          <p className="text-gray-600 mb-6 max-w-md mx-auto md:mx-0">
-            Fyll i formuläret så kontaktar vi dig inom kort – eller skicka in din ansökan direkt.
+          <p className="text-gray-600 mb-6 max-w-md">
+            Vi svarar vanligtvis inom 24 timmar. Berätta kort vad du behöver så återkommer vi med nästa steg.
           </p>
 
           <button
             onClick={() => setShowCVModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition w-full sm:w-auto"
+            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition"
           >
             Skicka din ansökan
+            <ArrowRight size={20} />
           </button>
         </div>
 
-        {/* Contact Form */}
+        {/* RIGHT — CONTACT FORM */}
         <form
           onSubmit={handleSubmit}
-          className="bg-blue-950 text-white rounded-xl p-6 sm:p-8 shadow-xl space-y-4"
+          className="bg-blue-950 text-white rounded-xl p-8 shadow-xl space-y-4"
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="name"
-              placeholder="Namn*"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="p-3 rounded-md text-gray-900 w-full"
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="E-post*"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="p-3 rounded-md text-gray-900 w-full"
-            />
-          </div>
+          <input
+            type="text"
+            name="name"
+            placeholder="Namn*"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="p-3 rounded-md text-gray-900 w-full"
+          />
+
+          <input
+            type="email"
+            name="email"
+            placeholder="E-post*"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="p-3 rounded-md text-gray-900 w-full"
+          />
 
           <textarea
             name="message"
-            placeholder="Meddelande"
+            placeholder="Berätta vad du behöver hjälp med"
             value={formData.message}
             onChange={handleChange}
-            required
             className="p-3 rounded-md text-gray-900 w-full h-28"
+            required
           ></textarea>
 
           <button
@@ -172,7 +209,7 @@ export default function Contact() {
         </form>
       </div>
 
-      {/* CV Modal */}
+      {/* CV MODAL */}
       {showCVModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
@@ -180,14 +217,14 @@ export default function Contact() {
               onClick={() => setShowCVModal(false)}
               className="absolute top-3 right-3 text-gray-500 text-xl"
             >
-              &times;
+              ×
             </button>
 
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-              Skicka in din ansökan
+              Ladda upp ditt CV
             </h3>
 
-            <form onSubmit={handleCvSubmit} className="space-y-3 text-left">
+            <form onSubmit={handleCvSubmit} className="space-y-4">
               <input
                 type="text"
                 name="name"
@@ -214,14 +251,14 @@ export default function Contact() {
                 value={cvData.about}
                 onChange={handleCvChange}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 h-24"
-              />
+              ></textarea>
 
               <input
                 type="file"
                 accept=".pdf,.doc,.docx"
                 onChange={handleFileChange}
                 required
-                className="block w-full border border-gray-300 rounded-md cursor-pointer"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 cursor-pointer"
               />
 
               <button
