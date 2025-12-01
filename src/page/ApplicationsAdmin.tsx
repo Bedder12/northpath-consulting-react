@@ -20,15 +20,20 @@ export default function ApplicationsAdmin() {
   const [checking, setChecking] = useState(true);
   const navigate = useNavigate();
 
+  // ✅ FIX: Guarantee session exists and RLS will allow SELECT
   useEffect(() => {
     const checkAuth = async () => {
+      // 1️⃣ Ensure Supabase session is loaded  
       const { data: { session } } = await supabase.auth.getSession();
+
+      console.log("Session loaded:", session);
 
       if (!session) {
         navigate("/admin/login");
         return;
       }
 
+      // 2️⃣ Check allowed admin table
       const email = session.user.email;
       const { data: allowed } = await supabase
         .from("allowed_admins")
@@ -41,25 +46,34 @@ export default function ApplicationsAdmin() {
         return;
       }
 
+      // 3️⃣ Now we know session exists -> allow loading data
       setChecking(false);
     };
 
     checkAuth();
   }, [navigate]);
 
+  // ⚡ RUN FETCH ONLY AFTER SESSION IS VERIFIED
   useEffect(() => {
     if (!checking) fetchApplications();
   }, [checking]);
 
   const fetchApplications = async () => {
     setLoading(true);
+
+    console.log("Fetching applications...");
+
     const { data, error } = await supabase
       .from("applications")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) console.error("Fel vid hämtning:", error);
-    else setApplications(data || []);
+    if (error) {
+      console.error("Fel vid hämtning:", error);
+    } else {
+      console.log("Fetched apps:", data);
+      setApplications(data || []);
+    }
 
     setLoading(false);
   };

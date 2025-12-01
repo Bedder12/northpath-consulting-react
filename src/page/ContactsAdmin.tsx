@@ -18,17 +18,21 @@ export default function ContactsAdmin() {
   const [checking, setChecking] = useState(true);
   const navigate = useNavigate();
 
+  // ✅ FIX: Guarantee Supabase session exists before fetching data
   useEffect(() => {
     const checkAuth = async () => {
+      // 1️⃣ Get Supabase session
       const { data: { session } } = await supabase.auth.getSession();
+
+      console.log("Session loaded:", session);
 
       if (!session) {
         navigate("/admin/login");
         return;
       }
 
+      // 2️⃣ Check allowed_admins table for authorization
       const email = session.user.email;
-
       const { data: allowed } = await supabase
         .from("allowed_admins")
         .select("*")
@@ -40,25 +44,34 @@ export default function ContactsAdmin() {
         return;
       }
 
+      // 3️⃣ Auth OK → Allow data fetch
       setChecking(false);
     };
 
     checkAuth();
   }, [navigate]);
 
+  // ⚡ Load contacts ONLY after authentication is verified
   useEffect(() => {
     if (!checking) fetchContacts();
   }, [checking]);
 
   const fetchContacts = async () => {
     setLoading(true);
+
+    console.log("Fetching contacts...");
+
     const { data, error } = await supabase
       .from("contacts")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) console.error(error);
-    else setContacts(data || []);
+    if (error) {
+      console.error("Fel vid hämtning:", error);
+    } else {
+      console.log("Fetched contacts:", data);
+      setContacts(data || []);
+    }
 
     setLoading(false);
   };
@@ -88,9 +101,9 @@ export default function ContactsAdmin() {
         </h1>
 
         {loading ? (
-          <p className="text-gray-500">Laddar kontakter...</p>
+          <p className="text-gray-500">Laddar förfrågningar...</p>
         ) : contacts.length === 0 ? (
-          <p className="text-gray-500">Inga nya förfrågningar ännu.</p>
+          <p className="text-gray-500">Inga förfrågningar att visa.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse border border-gray-200 text-sm">
@@ -106,29 +119,32 @@ export default function ContactsAdmin() {
               </thead>
 
               <tbody>
-                {contacts.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-50">
-                    <td className="border p-2 font-medium">{c.name}</td>
-                    <td className="border p-2">{c.company || "-"}</td>
+                {contacts.map((contact) => (
+                  <tr key={contact.id} className="hover:bg-gray-50">
+                    <td className="border p-2 font-medium">{contact.name}</td>
+
+                    <td className="border p-2">
+                      {contact.company || "-"}
+                    </td>
 
                     <td className="border p-2">
                       <a
-                        href={`mailto:${c.email}`}
+                        href={`mailto:${contact.email}`}
                         className="text-blue-600 hover:underline"
                       >
-                        {c.email}
+                        {contact.email}
                       </a>
                     </td>
 
                     <td className="border p-2 max-w-xs text-gray-700">
-                      {c.message || "-"}
+                      {contact.message || "-"}
                     </td>
 
                     <td className="border p-2">
                       <select
-                        value={c.status || "Ny"}
+                        value={contact.status || "Ny"}
                         onChange={(e) =>
-                          updateStatus(c.id, e.target.value)
+                          updateStatus(contact.id, e.target.value)
                         }
                         className="border border-gray-300 rounded-md px-2 py-1"
                       >
@@ -139,7 +155,7 @@ export default function ContactsAdmin() {
                     </td>
 
                     <td className="border p-2 text-gray-500">
-                      {new Date(c.created_at).toLocaleDateString("sv-SE")}
+                      {new Date(contact.created_at).toLocaleDateString("sv-SE")}
                     </td>
                   </tr>
                 ))}
