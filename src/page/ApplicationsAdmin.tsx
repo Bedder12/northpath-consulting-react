@@ -50,25 +50,34 @@ export default function ApplicationsAdmin() {
     checkAuth();
   }, [navigate]);
 
-  // Load applications
+  // Load applications (only after auth)
   useEffect(() => {
     if (!checking) fetchApplications();
   }, [checking]);
 
+  // FETCH APPLICATIONS — ONLY add new incoming ones
   const fetchApplications = async () => {
     setLoading(true);
+
     const { data, error } = await supabase
       .from("applications")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) console.error("Fel vid hämtning:", error);
-    else setApplications(data || []);
+    if (error) {
+      console.error("Fel vid hämtning:", error);
+    } else {
+      setApplications((prev) => {
+        const existingIds = new Set(prev.map((a) => a.id));
+        const newOnes = (data || []).filter((a) => !existingIds.has(a.id));
+        return [...prev, ...newOnes]; // Only add new items
+      });
+    }
 
     setLoading(false);
   };
 
-  // Update status
+  // UPDATE STATUS
   const updateStatus = async (id: number, newStatus: string) => {
     const { error } = await supabase
       .from("applications")
@@ -82,7 +91,7 @@ export default function ApplicationsAdmin() {
     }
   };
 
-  // Delete application
+  // DELETE APPLICATION
   const deleteApplication = async (id: number) => {
     const { error } = await supabase
       .from("applications")
@@ -107,11 +116,12 @@ export default function ApplicationsAdmin() {
     return <p className="text-center mt-10">Kontrollerar behörighet...</p>;
   }
 
-  // Counters
+  // COUNTERS
   const countNy = applications.filter((a) => a.status === "Ny").length;
   const countGranskad = applications.filter((a) => a.status === "Granskad").length;
   const countKontaktad = applications.filter((a) => a.status === "Kontaktad").length;
 
+  // FILTER
   const filteredApps =
     filter === "Alla"
       ? applications
@@ -159,9 +169,9 @@ export default function ApplicationsAdmin() {
               className="border border-gray-300 rounded-md px-3 py-1"
             >
               <option>Alla</option>
-              <option>Ny</option>
-              <option>Granskad</option>
-              <option>Kontaktad</option>
+              <option value="Ny">Ny</option>
+              <option value="Granskad">Granskad</option>
+              <option value="Kontaktad">Kontaktad</option>
             </select>
           </div>
 
@@ -207,7 +217,11 @@ export default function ApplicationsAdmin() {
 
                     <td className="border p-2">
                       {app.linkedin ? (
-                        <a href={app.linkedin} target="_blank" className="text-blue-600 hover:underline">
+                        <a
+                          href={app.linkedin}
+                          target="_blank"
+                          className="text-blue-600 hover:underline"
+                        >
                           Profil
                         </a>
                       ) : (
@@ -246,13 +260,14 @@ export default function ApplicationsAdmin() {
                     {/* STATUS */}
                     <td className="border p-2">
                       <select
-                        value={app.status || "Ny"}
+                        value={app.status ?? ""}
                         onChange={(e) => updateStatus(app.id, e.target.value)}
                         className="border border-gray-300 rounded-md px-2 py-1"
                       >
-                        <option>Ny</option>
-                        <option>Granskad</option>
-                        <option>Kontaktad</option>
+                        <option value="">Välj status</option>
+                        <option value="Ny">Ny</option>
+                        <option value="Granskad">Granskad</option>
+                        <option value="Kontaktad">Kontaktad</option>
                       </select>
                     </td>
 
@@ -292,7 +307,6 @@ export default function ApplicationsAdmin() {
 
             <h2 className="text-xl font-semibold mb-3 text-gray-800">CV Preview</h2>
 
-            {/* PDF Viewer */}
             <iframe
               src={previewUrl}
               className="flex-grow w-full rounded-md border"
