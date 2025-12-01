@@ -59,7 +59,9 @@ export default function UploadCV() {
       setFormData({ name: "", email: "", linkedin: "", about: "" });
     } catch (error: any) {
       console.error(error);
-      setMessage("Ett fel uppstod vid uppladdning. Försök igen.");
+   setMessage("Fel: " + JSON.stringify(error));
+   console.error(error);
+
     }
   };
 
