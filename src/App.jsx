@@ -5,7 +5,8 @@ import Home from "./page/HomePage.jsx";
 import About from "./page/About.jsx";
 import Services from "./page/Services.jsx";
 import Contact from "./page/Contact.jsx";
-import WorkWithUs from "./page/WorkWithUs.jsx";
+import WorkWithUs from "./page/WorkWithUs";
+import ForCompanies from "./page/ForCompanies";
 
 
 // 🔹 Admin Pages (endast en import per komponent)
@@ -24,7 +25,8 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
-          <Route path="/jobba-med-oss" element={<WorkWithUs />} />
+          <Route path="/work-with-us" element={<WorkWithUs />} />
+          <Route path="/for-companies" element={<ForCompanies />} />
           <Route path="/contact" element={<Contact />} />
 
           {/* Admin */}

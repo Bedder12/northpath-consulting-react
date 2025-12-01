@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import type { Session } from "@supabase/supabase-js";
 
@@ -10,10 +9,7 @@ export default function Navbar() {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const [companyOpen, setCompanyOpen] = useState(false);
-  const [candidateOpen, setCandidateOpen] = useState(false);
-
-  // Load Supabase session
+  // Load session + check if admin
   useEffect(() => {
     const loadSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -27,12 +23,14 @@ export default function Navbar() {
           .single();
 
         setIsAdmin(!!allowed);
+      } else {
+        setIsAdmin(false);
       }
     };
 
     loadSession();
 
-    // Listen to auth changes
+    // Listen for changes (login/logout)
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
       loadSession();
     });
@@ -40,6 +38,7 @@ export default function Navbar() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
+  // Logout
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setMenuOpen(false);
@@ -57,135 +56,23 @@ export default function Navbar() {
 
           {/* DESKTOP MENU */}
           <div className="hidden sm:flex space-x-8 items-center">
+            <Link to="/" className="text-gray-700 hover:text-blue-600">Hem</Link>
+            <Link to="/about" className="text-gray-700 hover:text-blue-600">Om oss</Link>
+            <Link to="/services" className="text-gray-700 hover:text-blue-600">Tjänster</Link>
 
-            <Link to="/" className="text-gray-700 hover:text-blue-600">
-              Hem
+            {/* Jobba med oss */}
+            <Link to="/work-with-us" className="text-gray-700 hover:text-blue-600">
+              Jobba med oss
             </Link>
 
-            {/* DROPDOWN – Företag */}
-            <div
-              className="relative"
-              onMouseEnter={() => setCompanyOpen(true)}
-              onMouseLeave={() => setCompanyOpen(false)}
-            >
-              <button className="flex items-center gap-1 text-gray-700 hover:text-blue-600">
-                För företag <ChevronDown size={16} />
-              </button>
-
-              <AnimatePresence>
-                {companyOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 5 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-lg py-3 z-50"
-                  >
-                    <Link to="/services" className="block px-4 py-2 hover:bg-gray-100">
-                      Konsultuthyrning
-                    </Link>
-
-                    <Link to="/services" className="block px-4 py-2 hover:bg-gray-100">
-                      Projekt & Specialiststöd
-                    </Link>
-
-                    <Link to="/services" className="block px-4 py-2 hover:bg-gray-100">
-                      Rekrytering & Direktmatchning
-                    </Link>
-
-                    <Link
-                      to="/case-studies"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Case Studies
-                    </Link>
-
-                    <Link
-                      to="/clients"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Kundloggor
-                    </Link>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* DROPDOWN – Jobbsökande */}
-            <div
-              className="relative"
-              onMouseEnter={() => setCandidateOpen(true)}
-              onMouseLeave={() => setCandidateOpen(false)}
-            >
-              <button className="flex items-center gap-1 text-gray-700 hover:text-blue-600">
-                Jobbsökande <ChevronDown size={16} />
-              </button>
-
-              <AnimatePresence>
-                {candidateOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 5 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute left-0 mt-2 w-64 bg-white shadow-lg rounded-lg py-3 z-50"
-                  >
-                    <Link
-                      to="/jobba-med-oss"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Jobba med oss
-                    </Link>
-
-                    <Link
-                      to="/jobba-med-oss#competences"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Våra kompetensområden
-                    </Link>
-
-                    <button
-                      onClick={() => setCandidateOpen(false)}
-                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                      <Link to="/jobba-med-oss#benefits">Fördelar & Trygghet</Link>
-                    </button>
-
-                    <Link
-                      to="/jobba-med-oss#process"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Så fungerar processen
-                    </Link>
-
-                    <Link
-                      to="/jobba-med-oss#faq"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Vanliga frågor
-                    </Link>
-
-                    <button
-                      className="block px-4 py-2 hover:bg-gray-100 text-left"
-                      onClick={() => setShowCVModal(true)}
-                    >
-                      Skicka CV
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <Link to="/contact" className="text-gray-700 hover:text-blue-600">
-              Kontakt
+            {/* För företag */}
+            <Link to="/for-companies" className="text-gray-700 hover:text-blue-600">
+              För företag
             </Link>
 
-            {/* ADMIN */}
+            {/* Admin */}
             {isAdmin ? (
-              <Link
-                to="/admin/dashboard"
-                className="text-blue-700 font-semibold"
-              >
+              <Link to="/admin/dashboard" className="text-blue-700 font-semibold">
                 Adminpanel
               </Link>
             ) : (
@@ -194,7 +81,7 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* LOGOUT */}
+            {/* Logout button */}
             {session && (
               <button
                 onClick={handleLogout}
@@ -217,72 +104,59 @@ export default function Navbar() {
 
       {/* MOBILE MENU */}
       {menuOpen && (
-        <div className="sm:hidden bg-white border-t border-gray-200 shadow-md px-4 py-4 space-y-3">
+        <div className="sm:hidden bg-white border-t border-gray-200 shadow-md">
+          <div className="px-4 py-4 space-y-2">
 
-          <Link to="/" onClick={() => setMenuOpen(false)} className="block">
-            Hem
-          </Link>
-
-          <div className="border-t pt-3">
-            <p className="font-semibold text-gray-700">För företag</p>
-
-            <Link to="/services" className="block py-2" onClick={() => setMenuOpen(false)}>
-              Konsultuthyrning
+            <Link to="/" onClick={() => setMenuOpen(false)} className="block">
+              Hem
             </Link>
 
-            <Link to="/services" className="block py-2" onClick={() => setMenuOpen(false)}>
-              Projekt & Specialiststöd
+            <Link to="/about" onClick={() => setMenuOpen(false)} className="block">
+              Om oss
             </Link>
 
-            <Link to="/services" className="block py-2" onClick={() => setMenuOpen(false)}>
-              Rekrytering
+            <Link to="/services" onClick={() => setMenuOpen(false)} className="block">
+              Tjänster
             </Link>
 
-            <Link to="/case-studies" className="block py-2" onClick={() => setMenuOpen(false)}>
-              Case Studies
-            </Link>
-
-            <Link to="/clients" className="block py-2" onClick={() => setMenuOpen(false)}>
-              Kundloggor
-            </Link>
-          </div>
-
-          <div className="border-t pt-3">
-            <p className="font-semibold text-gray-700">Jobbsökande</p>
-
-            <Link to="/jobba-med-oss" className="block py-2" onClick={() => setMenuOpen(false)}>
+            <Link to="/work-with-us" onClick={() => setMenuOpen(false)} className="block">
               Jobba med oss
             </Link>
 
-            <button
-              onClick={() => { setShowCVModal(true); setMenuOpen(false); }}
-              className="block py-2 text-left w-full"
-            >
-              Skicka CV
-            </button>
+            <Link to="/for-companies" onClick={() => setMenuOpen(false)} className="block">
+              För företag
+            </Link>
 
-            <Link to="/jobba-med-oss#competences" className="block py-2">Kompetensområden</Link>
-            <Link to="/jobba-med-oss#benefits" className="block py-2">Fördelar</Link>
-            <Link to="/jobba-med-oss#process" className="block py-2">Process</Link>
-            <Link to="/jobba-med-oss#faq" className="block py-2">FAQ</Link>
+            {/* Admin link */}
+            {isAdmin ? (
+              <Link
+                to="/admin/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="block text-blue-700 font-semibold"
+              >
+                Adminpanel
+              </Link>
+            ) : (
+              <Link
+                to="/admin/login"
+                onClick={() => setMenuOpen(false)}
+                className="block text-gray-700 hover:text-blue-600"
+              >
+                Admin
+              </Link>
+            )}
+
+            {/* Logout */}
+            {session && (
+              <button
+                onClick={handleLogout}
+                className="block text-left text-red-600 font-medium mt-3"
+              >
+                Logga ut
+              </button>
+            )}
+
           </div>
-
-          <Link to="/contact" className="block">Kontakt</Link>
-
-          {isAdmin ? (
-            <Link to="/admin/dashboard" className="block">Adminpanel</Link>
-          ) : (
-            <Link to="/admin/login" className="block">Admin</Link>
-          )}
-
-          {session && (
-            <button
-              onClick={handleLogout}
-              className="text-red-600 font-medium mt-2"
-            >
-              Logga ut
-            </button>
-          )}
         </div>
       )}
     </nav>

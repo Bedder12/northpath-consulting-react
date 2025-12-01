@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { supabase } from "../supabaseClient";
 import { checkRateLimit } from "../utils/rateLimit";
 import { Briefcase, Users, Target, ArrowRight, Star, MessageCircle } from "lucide-react";
-import heroImg from "../assets/office.webp";
+import heroImg from "../assets/Workhard.jpeg";
 
 export default function WorkWithUs() {
 
