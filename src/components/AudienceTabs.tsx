@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+// @ts-ignore: allow importing image assets without type declarations
 import kompetens from "../assets/kompetens.webp"
+// @ts-ignore: allow importing image assets without type declarations
 import konsult from "../assets/konsult.jpeg"
+// @ts-ignore: allow importing image assets without type declarations
 import student from "../assets/student.jpeg"
 
 type Tab = {

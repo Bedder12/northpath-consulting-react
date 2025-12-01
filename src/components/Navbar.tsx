@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import type { Session } from "@supabase/supabase-js";
 
@@ -9,7 +9,6 @@ export default function Navbar() {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Watch Supabase session
   useEffect(() => {
     const loadSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -30,7 +29,6 @@ export default function Navbar() {
 
     loadSession();
 
-    // Listen to auth changes
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
       loadSession();
     });
@@ -44,27 +42,70 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+    <nav className="bg-white/90 backdrop-blur-md shadow-sm fixed w-full top-0 z-50 border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
-          {/* LOGO */}
-          <Link to="/" className="text-blue-600 font-bold text-xl">
-            NorthPath Consulting
-          </Link>
+        {/* LOGO */}
+        <Link
+          to="/"
+          className="text-2xl font-extrabold text-blue-700 tracking-tight"
+        >
+          NorthPath
+        </Link>
 
-          {/* DESKTOP MENU */}
-          <div className="hidden sm:flex space-x-8 items-center">
-            <Link to="/" className="text-gray-700 hover:text-blue-600">Hem</Link>
-            <Link to="/about" className="text-gray-700 hover:text-blue-600">Om oss</Link>
-            <Link to="/services" className="text-gray-700 hover:text-blue-600">Tjänster</Link>
-            <Link to="/upload-cv" className="text-gray-700 hover:text-blue-600">Jobba med oss</Link>
-            <Link to="/contact" className="text-gray-700 hover:text-blue-600">Kontakt</Link>
+        {/* DESKTOP MENU */}
+        <div className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
+          <Link to="/" className="hover:text-blue-600">Hem</Link>
+          <Link to="/about" className="hover:text-blue-600">Om oss</Link>
+          <Link to="/services" className="hover:text-blue-600">Tjänster</Link>
+          <Link to="/upload-cv" className="hover:text-blue-600">Jobba med oss</Link>
+          <Link to="/contact" className="hover:text-blue-600">Kontakt</Link>
 
-            {/* ADMIN BEHAVIOR: always show link but destination changes */}
+          {isAdmin ? (
+            <Link to="/admin/dashboard" className="text-blue-700 font-semibold">
+              Adminpanel
+            </Link>
+          ) : (
+            <Link to="/admin/login" className="hover:text-blue-600">
+              Admin
+            </Link>
+          )}
+
+          {session && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm"
+            >
+              <LogOut size={16} />
+              Logga ut
+            </button>
+          )}
+        </div>
+
+        {/* MOBILE MENU BUTTON */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
+        >
+          {menuOpen ? <X size={26} /> : <Menu size={26} />}
+        </button>
+      </div>
+
+      {/* MOBILE MENU */}
+      {menuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-200 shadow-sm animate-fade">
+          <div className="px-6 py-5 flex flex-col gap-4 text-gray-700 text-lg font-medium">
+
+            <Link to="/" onClick={() => setMenuOpen(false)}>Hem</Link>
+            <Link to="/about" onClick={() => setMenuOpen(false)}>Om oss</Link>
+            <Link to="/services" onClick={() => setMenuOpen(false)}>Tjänster</Link>
+            <Link to="/upload-cv" onClick={() => setMenuOpen(false)}>Jobba med oss</Link>
+            <Link to="/contact" onClick={() => setMenuOpen(false)}>Kontakt</Link>
+
             {isAdmin ? (
               <Link
                 to="/admin/dashboard"
+                onClick={() => setMenuOpen(false)}
                 className="text-blue-700 font-semibold"
               >
                 Adminpanel
@@ -72,69 +113,18 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/admin/login"
-                className="text-gray-700 hover:text-blue-600"
+                onClick={() => setMenuOpen(false)}
               >
                 Admin
               </Link>
             )}
 
-            {/* LOGOUT BUTTON ONLY IF LOGGED IN */}
             {session && (
               <button
                 onClick={handleLogout}
-                className="text-red-600 hover:text-red-700 text-sm ml-4"
+                className="text-left text-red-600 mt-3 flex items-center gap-2"
               >
-                Logga ut
-              </button>
-            )}
-          </div>
-
-          {/* MOBILE MENU TOGGLE */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="sm:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
-          >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-      </div>
-
-      {/* MOBILE MENU */}
-      {menuOpen && (
-        <div className="sm:hidden bg-white border-t border-gray-200 shadow-md">
-          <div className="px-4 py-4 space-y-2">
-            <Link to="/" onClick={() => setMenuOpen(false)} className="block">Hem</Link>
-            <Link to="/about" onClick={() => setMenuOpen(false)} className="block">Om oss</Link>
-            <Link to="/services" onClick={() => setMenuOpen(false)} className="block">Tjänster</Link>
-            <Link to="/upload-cv" onClick={() => setMenuOpen(false)} className="block">Jobba med oss</Link>
-            <Link to="/contact" onClick={() => setMenuOpen(false)} className="block">Kontakt</Link>
-
-            {/* ADMIN LINK SAME BEHAVIOR: changes depending on logged-in admin */}
-            {isAdmin ? (
-              <Link
-                to="/admin/dashboard"
-                onClick={() => setMenuOpen(false)}
-                className="block text-blue-700 font-semibold"
-              >
-                Adminpanel
-              </Link>
-            ) : (
-              <Link
-                to="/admin/login"
-                onClick={() => setMenuOpen(false)}
-                className="block text-gray-700 hover:text-blue-600"
-              >
-                Admin
-              </Link>
-            )}
-
-            {/* LOGOUT BUTTON */}
-            {session && (
-              <button
-                onClick={handleLogout}
-                className="block text-left text-red-600 font-medium mt-3"
-              >
-                Logga ut
+                <LogOut size={18} /> Logga ut
               </button>
             )}
           </div>

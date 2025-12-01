@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
+import { checkRateLimit } from "../utils/rateLimit";
 import office from "../assets/office.webp";
 
 export default function Hero() {
@@ -17,18 +18,23 @@ export default function Hero() {
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  ) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFile(e.target.files?.[0] || null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!file) {
       setMessage("Välj en fil innan du laddar upp.");
+      return;
+    }
+
+    // 🔥 RATE LIMIT
+    const rate = await checkRateLimit();
+    if (!rate.allowed) {
+      setMessage("För många försök. Försök igen om 1 timme.");
       return;
     }
 
@@ -36,20 +42,17 @@ export default function Hero() {
       setLoading(true);
       setMessage("");
 
-      // 1️⃣ Ladda upp CV till Supabase Storage
       const filePath = `cvs/${Date.now()}_${file.name}`;
       const { error: uploadError } = await supabase.storage
         .from("cvs")
         .upload(filePath, file);
       if (uploadError) throw uploadError;
 
-      // 2️⃣ Hämta offentlig URL
       const { data: publicData } = supabase.storage
         .from("cvs")
         .getPublicUrl(filePath);
       const fileUrl = publicData?.publicUrl;
 
-      // 3️⃣ Spara ansökan i databasen
       const { error: insertError } = await supabase.from("applications").insert([
         {
           name: formData.name,
@@ -75,15 +78,13 @@ export default function Hero() {
   return (
     <section className="bg-gradient-to-tr from-sky-100 to-green-50 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-28 grid lg:grid-cols-2 gap-10 items-center text-center lg:text-left">
-        {/* 🧠 Textdel */}
         <div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">
             Vi hjälper företag att navigera genom förändring och växa hållbart.
           </h1>
           <p className="mt-4 text-lg text-gray-600 max-w-md mx-auto lg:mx-0">
-            På North Path Consulting erbjuder vi erfarna konsulter inom ekonomi
-            och verksamhetsutveckling – flexibla lösningar för rätt kompetens i
-            rätt tid.
+            På North Path Consulting erbjuder vi erfarna konsulter inom ekonomi,
+            verksamhetsutveckling och IT – flexibla lösningar för rätt kompetens.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
@@ -108,7 +109,6 @@ export default function Hero() {
           )}
         </div>
 
-        {/* 🖼️ Bild */}
         <img
           src={office}
           alt="Kontorsmiljö"
@@ -116,13 +116,13 @@ export default function Hero() {
         />
       </div>
 
-      {/* ✅ Popup-modal för CV-uppladdning */}
+      {/* CV Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative mx-4 sm:mx-0">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl"
+              className="absolute top-3 right-3 text-gray-500 text-xl"
             >
               &times;
             </button>
@@ -141,7 +141,6 @@ export default function Hero() {
                 required
                 className="w-full border border-gray-300 rounded-md px-3 py-2"
               />
-
               <input
                 type="email"
                 name="email"
@@ -151,16 +150,6 @@ export default function Hero() {
                 required
                 className="w-full border border-gray-300 rounded-md px-3 py-2"
               />
-
-              <input
-                type="url"
-                name="linkedin"
-                placeholder="LinkedIn (valfritt)"
-                value={formData.linkedin}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
-              />
-
               <textarea
                 name="about"
                 placeholder="Berätta kort om dig själv"
@@ -168,25 +157,23 @@ export default function Hero() {
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 h-24"
               />
-
               <input
                 type="file"
                 accept=".pdf,.doc,.docx"
                 onChange={handleFileChange}
                 required
-                className="block w-full text-sm border border-gray-300 rounded-md cursor-pointer"
+                className="block w-full border border-gray-300 rounded-md cursor-pointer"
               />
-
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-2 rounded-md font-medium hover:bg-blue-700 transition"
+                className="w-full bg-blue-600 text-white py-2 rounded-md"
               >
                 {loading ? "Skickar..." : "Skicka CV"}
               </button>
 
               {message && (
-                <p className="text-sm text-center text-gray-700 mt-2">{message}</p>
+                <p className="text-center text-gray-700 mt-2">{message}</p>
               )}
             </form>
           </div>

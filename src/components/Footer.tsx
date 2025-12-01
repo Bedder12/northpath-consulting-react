@@ -1,76 +1,48 @@
-import { Link } from "react-router-dom";
-import { Linkedin, Instagram } from "lucide-react";
-
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid gap-12 sm:grid-cols-2 md:grid-cols-4">
-        {/* 🏢 Om företaget */}
-        <div className="md:col-span-2">
-          <h3 className="text-white text-xl font-bold mb-4">
-            North Path Consulting
-          </h3>
-          <p className="text-gray-400 mb-6 leading-relaxed">
-            Vi hjälper företag att navigera genom förändring, växa hållbart och
-            effektivisera verksamheten med stöd av våra noggrant utvalda
-            konsulter. Tillsammans skapar vi trygghet, stabilitet och framgång.
-          </p>
-          <div className="flex space-x-5 justify-center md:justify-start">
-            <a
-              href="https://www.linkedin.com/company/northpath"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white transition"
-            >
-              <Linkedin size={22} />
-            </a>
-            <a
-              href="https://www.instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white transition"
-            >
-              <Instagram size={22} />
-            </a>
-          </div>
-        </div>
+    <footer className="bg-blue-950 text-white pt-16 pb-10 mt-32">
+      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-12">
 
-        {/* 🔗 Navigering */}
+        {/* LEFT */}
         <div>
-          <h3 className="text-white text-sm font-semibold uppercase tracking-wider mb-4">
-            Navigering
-          </h3>
-          <ul className="space-y-2 text-center sm:text-left">
-            <li><Link to="/" className="hover:text-white transition">Hem</Link></li>
-            <li><Link to="/about" className="hover:text-white transition">Om oss</Link></li>
-            <li><Link to="/services" className="hover:text-white transition">Tjänster</Link></li>
-            <li><Link to="/contact" className="hover:text-white transition">Kontakt</Link></li>
+          <h3 className="text-2xl font-bold mb-4">NorthPath Consulting</h3>
+          <p className="text-blue-200 text-sm leading-relaxed max-w-sm">
+            Vi hjälper företag med konsultuthyrning, rekrytering och moderna IT-lösningar.
+            Med fokus på kvalitet, långsiktighet och professionell utveckling.
+          </p>
+        </div>
+
+        {/* NAVIGATION */}
+        <div>
+          <h4 className="text-xl font-semibold mb-4">Snabblänkar</h4>
+          <ul className="space-y-2 text-blue-200">
+            <li><a href="/" className="hover:text-white">Hem</a></li>
+            <li><a href="/about" className="hover:text-white">Om oss</a></li>
+            <li><a href="/services" className="hover:text-white">Tjänster</a></li>
+            <li><a href="/upload-cv" className="hover:text-white">Jobba med oss</a></li>
+            <li><a href="/contact" className="hover:text-white">Kontakt</a></li>
           </ul>
         </div>
 
-        {/* 📞 Kontakt */}
-        <div className="text-center sm:text-left">
-          <h3 className="text-white text-sm font-semibold uppercase tracking-wider mb-4">
-            Kontakt
-          </h3>
-          <ul className="space-y-2 text-gray-400">
-            <li>info@northpath.se</li>
-            <li>+46 (0)70 123 45 67</li>
-            <li>Stockholm</li>
-          </ul>
-          <Link
-            to="/contact"
-            className="inline-block mt-5 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md font-medium transition"
+        {/* CONTACT */}
+        <div>
+          <h4 className="text-xl font-semibold mb-4">Kontakt</h4>
+          <p className="text-blue-200 text-sm">info@northpath.se</p>
+          <p className="text-blue-200 text-sm mt-1">+46 (0)70 123 45 67</p>
+
+          <a
+            href="https://www.linkedin.com/company/northpath"
+            target="_blank"
+            className="inline-block mt-4 text-blue-300 hover:text-white underline"
           >
-            Boka möte
-          </Link>
+            Följ oss på LinkedIn
+          </a>
         </div>
       </div>
 
-      {/* ⚖️ Copyright */}
-      <div className="border-t border-gray-700 py-6 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} North Path Consulting. Alla rättigheter förbehållna.
-      </div>
+      <p className="text-center text-blue-400 text-xs mt-12">
+        © {new Date().getFullYear()} NorthPath Consulting — Alla rättigheter förbehållna.
+      </p>
     </footer>
   );
 }
