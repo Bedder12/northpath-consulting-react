@@ -7,6 +7,7 @@ import Services from "./page/Services.jsx";
 import Contact from "./page/Contact.jsx";
 import WorkWithUs from "./page/WorkWithUs";
 import ForCompanies from "./page/ForCompanies";
+import { useVersionCheck } from "./hooks/useVersionCheck";
 
 
 // 🔹 Admin Pages (endast en import per komponent)
@@ -16,6 +17,7 @@ import ApplicationsAdmin from "./page/ApplicationsAdmin.jsx";
 import ContactsAdmin from "./page/ContactsAdmin.jsx";
 
 export default function App() {
+    useVersionCheck();
   return (
     <BrowserRouter>
       <Navbar />
