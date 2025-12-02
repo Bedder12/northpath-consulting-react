@@ -1,15 +1,16 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "./useAuth";
-import React from "react";
+import { useAuthContext } from "./AuthProvider";
+import { ReactNode } from "react";
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
+interface ProtectedAdminRouteProps {
+  children: ReactNode;
 }
 
-export default function ProtectedAdminRoute({ children }: ProtectedRouteProps) {
-  const { loading, session, isAdmin } = useAuth();
+export default function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
+  const { loading, session, isAdmin } = useAuthContext();
 
-  if (loading) {
+  // Still loading or admin not checked yet
+  if (loading || isAdmin === null) {
     return <p className="text-center mt-10">Kontrollerar behörighet...</p>;
   }
 
