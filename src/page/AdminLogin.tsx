@@ -11,11 +11,9 @@ export default function AdminLogin() {
     setError("");
     setMessage("");
 
+    // SKICKA OTP UTAN redirectTo → Supabase använder Site URL som callback
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email,
-      options: {
-        emailRedirectTo: window.location.origin + "/auth/callback",
-      },
     });
 
     if (otpError) {
