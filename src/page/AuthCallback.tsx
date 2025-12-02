@@ -6,29 +6,28 @@ export default function AuthCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function finishLogin() {
+    async function verify() {
+      let session = null;
 
-      // 1️⃣ Try reading session immediately
-      let { data } = await supabase.auth.getSession();
+      // Retry up to 30 times (≈ 4.5s)
+      for (let i = 0; i < 30; i++) {
+        const { data } = await supabase.auth.getSession();
+        session = data.session;
 
-      // 2️⃣ If session isn't available yet, retry until it exists
-      let retries = 0;
-      while (!data.session && retries < 20) {
-        await new Promise(res => setTimeout(res, 150)); // wait 150ms
-        ({ data } = await supabase.auth.getSession());
-        retries++;
+        if (session) break;
+
+        await new Promise((res) => setTimeout(res, 150));
       }
 
-      // 3️⃣ When session exists → navigate to dashboard
-      if (data.session) {
+      if (session) {
         navigate("/admin/dashboard", { replace: true });
       } else {
-        // 4️⃣ Fallback if something failed
+        alert("Kunde inte logga in. Försök igen.");
         navigate("/admin/login", { replace: true });
       }
     }
 
-    finishLogin();
+    verify();
   }, []);
 
   return (
