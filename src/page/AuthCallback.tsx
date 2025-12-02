@@ -7,11 +7,25 @@ export default function AuthCallback() {
 
   useEffect(() => {
     async function finishLogin() {
-      // Give Supabase time to finish parsing the magic link
-      await supabase.auth.getSession();
 
-      // Redirect AFTER session is initialized
-      navigate("/admin/dashboard", { replace: true });
+      // 1️⃣ Try reading session immediately
+      let { data } = await supabase.auth.getSession();
+
+      // 2️⃣ If session isn't available yet, retry until it exists
+      let retries = 0;
+      while (!data.session && retries < 20) {
+        await new Promise(res => setTimeout(res, 150)); // wait 150ms
+        ({ data } = await supabase.auth.getSession());
+        retries++;
+      }
+
+      // 3️⃣ When session exists → navigate to dashboard
+      if (data.session) {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        // 4️⃣ Fallback if something failed
+        navigate("/admin/login", { replace: true });
+      }
     }
 
     finishLogin();
