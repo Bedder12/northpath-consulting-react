@@ -3,7 +3,7 @@ import { supabase } from "../supabaseClient";
 
 interface AuthContextType {
   session: any;
-  isAdmin: boolean;
+  isAdmin: boolean | null;
   loading: boolean;
   logout: () => Promise<void>;
 }
@@ -12,56 +12,60 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
+  async function checkAdmin(userEmail: string) {
+    const { data, error } = await supabase
+      .from("allowed_admins")
+      .select("email")
+      .eq("email", userEmail)
+      .maybeSingle();
+
+    if (error) {
+      console.warn("Admin check error:", error);
+      setIsAdmin(false);
+      return;
+    }
+
+    setIsAdmin(!!data);
+  }
+
   useEffect(() => {
-    const load = async () => {
+    async function load() {
       const { data } = await supabase.auth.getSession();
       const s = data.session;
+
       setSession(s);
 
       if (s?.user?.email) {
-        const { data: allowed, error } = await supabase
-          .from("allowed_admins")
-          .select("email")
-          .eq("email", s.user.email)
-          .maybeSingle();
-
-        setIsAdmin(!error && !!allowed);
+        await checkAdmin(s.user.email);
       }
 
       setLoading(false);
-    };
+    }
 
     load();
 
-    // Small delay to avoid Chrome timing issues
-    setTimeout(() => {}, 30);
-
     const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
         setSession(session);
 
         if (session?.user?.email) {
-          const { data: allowed, error } = await supabase
-            .from("allowed_admins")
-            .select("email")
-            .eq("email", session.user.email)
-            .maybeSingle();
-
-          setIsAdmin(!error && !!allowed);
+          await checkAdmin(session.user.email);
         } else {
           setIsAdmin(false);
         }
       }
     );
 
-    return () => listener?.subscription?.unsubscribe?.();
+    return () => listener.subscription.unsubscribe();
   }, []);
 
   const logout = async () => {
     await supabase.auth.signOut();
+    localStorage.clear();
+    sessionStorage.clear();
     window.location.href = "/admin/login";
   };
 
