@@ -1,68 +1,13 @@
-import { useState, useEffect } from "react";
+// src/components/Navbar.tsx
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { supabase } from "../supabaseClient";
-import type { Session } from "@supabase/supabase-js";
+import { useAuth } from "../auth/useAuth";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [session, setSession] = useState<Session | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Load session + check if admin
-  useEffect(() => {
-    const loadSession = async () => {
-
-      // 🔍 1. Kolla session
-      const { data } = await supabase.auth.getSession();
-      const session = data.session;
-
-      console.log("SESSION:", session); // <-- Viktig logg
-      setSession(session);
-
-      if (!session?.user?.email) {
-        console.log("Ingen session → användaren är inte inloggad.");
-        setIsAdmin(false);
-        return;
-      }
-
-      const email = session.user.email;
-      console.log("Inloggad som:", email);
-
-      // 🔍 2. Kolla om användaren ligger i allowed_admins
-      const { data: allowed, error } = await supabase
-        .from("allowed_admins")
-        .select("email")
-        .eq("email", email)
-        .maybeSingle();
-
-      console.log("ADMIN CHECK — DATA:", allowed);     // <-- Viktig logg
-      console.log("ADMIN CHECK — ERROR:", error);       // <-- Indicera 406 här
-
-      // Om Supabase returnerar error → Ingen admin
-      if (error) {
-        setIsAdmin(false);
-        return;
-      }
-
-      setIsAdmin(!!allowed);
-    };
-
-    loadSession();
-
-    // Lyssna på login/logout events
-    const { data: listener } = supabase.auth.onAuthStateChange(() => {
-      loadSession();
-    });
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
-
-  // Logout
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setMenuOpen(false);
-  };
+  const { session, isAdmin, logout } = useAuth();
 
   return (
     <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
@@ -76,13 +21,14 @@ export default function Navbar() {
 
           {/* DESKTOP MENU */}
           <div className="hidden sm:flex space-x-8 items-center">
+
             <Link to="/" className="text-gray-700 hover:text-blue-600">Hem</Link>
             <Link to="/about" className="text-gray-700 hover:text-blue-600">Om oss</Link>
             <Link to="/services" className="text-gray-700 hover:text-blue-600">Tjänster</Link>
             <Link to="/work-with-us" className="text-gray-700 hover:text-blue-600">Jobba med oss</Link>
             <Link to="/for-companies" className="text-gray-700 hover:text-blue-600">För företag</Link>
 
-            {/* Admin */}
+            {/* Admin link */}
             {isAdmin ? (
               <Link to="/admin/dashboard" className="text-blue-700 font-semibold">
                 Adminpanel
@@ -93,10 +39,9 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Logout */}
             {session && (
               <button
-                onClick={handleLogout}
+                onClick={logout}
                 className="text-red-600 hover:text-red-700 text-sm ml-4"
               >
                 Logga ut
@@ -125,20 +70,27 @@ export default function Navbar() {
             <Link to="/work-with-us" onClick={() => setMenuOpen(false)}>Jobba med oss</Link>
             <Link to="/for-companies" onClick={() => setMenuOpen(false)}>För företag</Link>
 
-            {/* Admin link */}
+            {/* Admin */}
             {isAdmin ? (
-              <Link to="/admin/dashboard" className="text-blue-700 font-semibold" onClick={() => setMenuOpen(false)}>
+              <Link
+                to="/admin/dashboard"
+                className="text-blue-700 font-semibold"
+                onClick={() => setMenuOpen(false)}
+              >
                 Adminpanel
               </Link>
             ) : (
-              <Link to="/admin/login" className="text-gray-700 hover:text-blue-600" onClick={() => setMenuOpen(false)}>
+              <Link
+                to="/admin/login"
+                className="text-gray-700 hover:text-blue-600"
+                onClick={() => setMenuOpen(false)}
+              >
                 Admin
               </Link>
             )}
 
-            {/* Logout */}
             {session && (
-              <button onClick={handleLogout} className="text-red-600 font-medium mt-3">
+              <button onClick={logout} className="text-red-600 font-medium mt-3">
                 Logga ut
               </button>
             )}

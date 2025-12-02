@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 
 interface Contact {
@@ -17,43 +16,12 @@ export default function ContactsAdmin() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("Alla");
-  const [checking, setChecking] = useState(true);
   const [previewMessage, setPreviewMessage] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  // AUTH CHECK
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    fetchContacts();
+  }, []);
 
-      if (!session) {
-        navigate("/admin/login");
-        return;
-      }
-
-      const { data: allowed } = await supabase
-        .from("allowed_admins")
-        .select("*")
-        .eq("email", session.user.email)
-        .single();
-
-      if (!allowed) {
-        navigate("/");
-        return;
-      }
-
-      setChecking(false);
-    };
-
-    checkAuth();
-  }, [navigate]);
-
-  // LOAD CONTACTS AFTER AUTH
-  useEffect(() => {
-    if (!checking) fetchContacts();
-  }, [checking]);
-
-  // FETCH CONTACTS — ONLY add NEW ones
   const fetchContacts = async () => {
     setLoading(true);
 
@@ -62,20 +30,13 @@ export default function ContactsAdmin() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Fel vid hämtning:", error);
-    } else {
-      setContacts((prev) => {
-        const existingIds = new Set(prev.map((c) => c.id));
-        const newOnes = (data || []).filter((c) => !existingIds.has(c.id));
-        return [...prev, ...newOnes];
-      });
+    if (!error && data) {
+      setContacts(data);
     }
 
     setLoading(false);
   };
 
-  // UPDATE STATUS
   const updateStatus = async (id: number, newStatus: string) => {
     const { error } = await supabase
       .from("contacts")
@@ -89,7 +50,6 @@ export default function ContactsAdmin() {
     }
   };
 
-  // DELETE CONTACT REQUEST
   const deleteContact = async (id: number) => {
     const { error } = await supabase.from("contacts").delete().eq("id", id);
 
@@ -98,23 +58,12 @@ export default function ContactsAdmin() {
     }
   };
 
-  // EXPORT TO EXCEL
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(contacts);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Contacts");
-
     XLSX.writeFile(workbook, "contact_requests.xlsx");
   };
-
-  if (checking) {
-    return <p className="text-center mt-10">Kontrollerar behörighet...</p>;
-  }
-
-  // COUNTERS
-  const countNy = contacts.filter((c) => c.status === "Ny").length;
-  const countKontaktad = contacts.filter((c) => c.status === "Kontaktad").length;
-  const countAvslutad = contacts.filter((c) => c.status === "Avslutad").length;
 
   const filteredContacts =
     filter === "Alla"
@@ -140,20 +89,20 @@ export default function ContactsAdmin() {
         {/* STATUS COUNTERS */}
         <div className="flex flex-wrap gap-4 mb-6">
           <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-md font-medium">
-            Ny: {countNy}
+            Ny: {contacts.filter((c) => c.status === "Ny").length}
           </div>
           <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-md font-medium">
-            Kontaktad: {countKontaktad}
+            Kontaktad: {contacts.filter((c) => c.status === "Kontaktad").length}
           </div>
           <div className="bg-red-100 text-red-800 px-4 py-2 rounded-md font-medium">
-            Avslutad: {countAvslutad}
+            Avslutad: {contacts.filter((c) => c.status === "Avslutad").length}
           </div>
           <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-md font-medium">
             Totalt: {contacts.length}
           </div>
         </div>
 
-        {/* FILTER + REFRESH */}
+        {/* FILTER */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <label className="text-gray-700 font-medium mr-2">Filter:</label>
@@ -202,7 +151,6 @@ export default function ContactsAdmin() {
                   <tr key={c.id} className="hover:bg-gray-50">
 
                     <td className="border p-2 font-medium">{c.name}</td>
-
                     <td className="border p-2">{c.company || "-"}</td>
 
                     <td className="border p-2">
@@ -211,7 +159,6 @@ export default function ContactsAdmin() {
                       </a>
                     </td>
 
-                    {/* MESSAGE PREVIEW */}
                     <td className="border p-2 max-w-xs">
                       <button
                         onClick={() => setPreviewMessage(c.message || "Inget meddelande")}
@@ -221,7 +168,6 @@ export default function ContactsAdmin() {
                       </button>
                     </td>
 
-                    {/* STATUS DROPDOWN */}
                     <td className="border p-2">
                       <select
                         value={c.status ?? ""}
@@ -235,7 +181,6 @@ export default function ContactsAdmin() {
                       </select>
                     </td>
 
-                    {/* DELETE BUTTON */}
                     <td className="border p-2 text-center">
                       <button
                         onClick={() => deleteContact(c.id)}
@@ -248,10 +193,10 @@ export default function ContactsAdmin() {
                     <td className="border p-2 text-gray-500">
                       {new Date(c.created_at).toLocaleDateString("sv-SE")}
                     </td>
+
                   </tr>
                 ))}
               </tbody>
-
             </table>
           </div>
         )}
@@ -274,9 +219,11 @@ export default function ContactsAdmin() {
             <p className="text-gray-800 whitespace-pre-wrap">
               {previewMessage}
             </p>
+
           </div>
         </div>
       )}
+
     </section>
   );
 }

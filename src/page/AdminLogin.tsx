@@ -1,33 +1,16 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
-import { useNavigate } from "react-router-dom";
 
 export default function AdminLogin() {
-  
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setMessage("");
 
-    // 1️⃣ Check if email is allowed before sending login link
-const { data: allowed } = await supabase
-  .from("allowed_admins")
-  .select("*")
-  .eq("email", email)
-  .single();
-
-
-    if (!allowed) {
-      setError("Du har inte behörighet att logga in.");
-      return;
-    }
-
-    // 2️⃣ Send magic login link
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email,
       options: {

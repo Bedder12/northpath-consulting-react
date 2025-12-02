@@ -1,49 +1,13 @@
-import { useEffect, useState } from "react";
+// src/pages/AdminDashboard.tsx
+import { Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
-import { useNavigate, Link } from "react-router-dom";
 
 export default function AdminDashboard() {
-  const navigate = useNavigate();
-  const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      // Not logged in → redirect
-      if (!session) {
-        navigate("/admin/login");
-        return;
-      }
-
-      const email = session.user.email;
-
-      // Check if allowed admin
-      const { data: allowed } = await supabase
-        .from("allowed_admins")
-        .select("*")
-        .eq("email", email)
-        .single();
-
-      if (!allowed) {
-        navigate("/");
-        return;
-      }
-
-      setChecking(false);
-    };
-
-    checkAuth();
-  }, [navigate]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/admin/login");
+    window.location.href = "/admin/login";
   };
-
-  if (checking) {
-    return <p className="text-center mt-10">Kontrollerar behörighet...</p>;
-  }
 
   return (
     <section className="min-h-screen bg-gray-50 py-16">

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 
 interface Application {
@@ -18,44 +17,12 @@ export default function ApplicationsAdmin() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("Alla");
-  const [checking, setChecking] = useState(true);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  // Check admin authentication
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    fetchApplications();
+  }, []);
 
-      if (!session) {
-        navigate("/admin/login");
-        return;
-      }
-
-      const email = session.user.email;
-      const { data: allowed } = await supabase
-        .from("allowed_admins")
-        .select("*")
-        .eq("email", email)
-        .single();
-
-      if (!allowed) {
-        navigate("/");
-        return;
-      }
-
-      setChecking(false);
-    };
-
-    checkAuth();
-  }, [navigate]);
-
-  // Load applications (only after auth)
-  useEffect(() => {
-    if (!checking) fetchApplications();
-  }, [checking]);
-
-  // FETCH APPLICATIONS — ONLY add new incoming ones
   const fetchApplications = async () => {
     setLoading(true);
 
@@ -64,20 +31,13 @@ export default function ApplicationsAdmin() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Fel vid hämtning:", error);
-    } else {
-      setApplications((prev) => {
-        const existingIds = new Set(prev.map((a) => a.id));
-        const newOnes = (data || []).filter((a) => !existingIds.has(a.id));
-        return [...prev, ...newOnes]; // Only add new items
-      });
+    if (!error && data) {
+      setApplications(data);
     }
 
     setLoading(false);
   };
 
-  // UPDATE STATUS
   const updateStatus = async (id: number, newStatus: string) => {
     const { error } = await supabase
       .from("applications")
@@ -91,37 +51,21 @@ export default function ApplicationsAdmin() {
     }
   };
 
-  // DELETE APPLICATION
   const deleteApplication = async (id: number) => {
-    const { error } = await supabase
-      .from("applications")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("applications").delete().eq("id", id);
 
     if (!error) {
       setApplications((prev) => prev.filter((a) => a.id !== id));
     }
   };
 
-  // EXPORT TO EXCEL
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(applications);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Applications");
-
     XLSX.writeFile(workbook, "applications.xlsx");
   };
 
-  if (checking) {
-    return <p className="text-center mt-10">Kontrollerar behörighet...</p>;
-  }
-
-  // COUNTERS
-  const countNy = applications.filter((a) => a.status === "Ny").length;
-  const countGranskad = applications.filter((a) => a.status === "Granskad").length;
-  const countKontaktad = applications.filter((a) => a.status === "Kontaktad").length;
-
-  // FILTER
   const filteredApps =
     filter === "Alla"
       ? applications
@@ -143,23 +87,7 @@ export default function ApplicationsAdmin() {
           </button>
         </div>
 
-        {/* STATUS COUNTERS */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-md font-medium">
-            Ny: {countNy}
-          </div>
-          <div className="bg-purple-100 text-purple-800 px-4 py-2 rounded-md font-medium">
-            Granskad: {countGranskad}
-          </div>
-          <div className="bg-green-100 text-green-800 px-4 py-2 rounded-md font-medium">
-            Kontaktad: {countKontaktad}
-          </div>
-          <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-md font-medium">
-            Totalt: {applications.length}
-          </div>
-        </div>
-
-        {/* FILTER + REFRESH */}
+        {/* FILTER */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <label className="text-gray-700 font-medium mr-2">Filter:</label>
@@ -233,7 +161,6 @@ export default function ApplicationsAdmin() {
                       {app.about || "-"}
                     </td>
 
-                    {/* CV COLUMN */}
                     <td className="border p-2 text-center">
                       {app.file_url ? (
                         <div className="flex flex-col items-center gap-1">
@@ -257,7 +184,6 @@ export default function ApplicationsAdmin() {
                       )}
                     </td>
 
-                    {/* STATUS */}
                     <td className="border p-2">
                       <select
                         value={app.status ?? ""}
@@ -271,7 +197,6 @@ export default function ApplicationsAdmin() {
                       </select>
                     </td>
 
-                    {/* DELETE BUTTON */}
                     <td className="border p-2 text-center">
                       <button
                         onClick={() => deleteApplication(app.id)}
@@ -297,7 +222,6 @@ export default function ApplicationsAdmin() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white w-[90%] max-w-4xl h-[90%] rounded-xl shadow-xl p-4 relative flex flex-col">
 
-            {/* Close button */}
             <button
               className="absolute top-3 right-3 text-gray-700 hover:text-black text-xl"
               onClick={() => setPreviewUrl(null)}
@@ -319,6 +243,7 @@ export default function ApplicationsAdmin() {
             >
               Ladda ner filen
             </a>
+
           </div>
         </div>
       )}
