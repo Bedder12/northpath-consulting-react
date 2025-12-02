@@ -28,14 +28,6 @@ export default function ContactSection() {
             </button>
           </form>
         </div>
-
-        <div>
-          <img
-            src="/images/contact.jpg"
-            alt="Kontor"
-            className="rounded-xl shadow-lg object-cover w-full h-96"
-          />
-        </div>
       </div>
     </section>
   );

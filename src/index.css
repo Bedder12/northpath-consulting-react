@@ -23,24 +23,69 @@
     @apply text-blue-600 hover:text-blue-700 transition-colors;
   }
 
+  /* MAKE ALL IMAGES RESPONSIVE */
   img {
-    max-width: 100%;
-    height: auto;
-    display: block;
+    @apply max-w-full h-auto block;
   }
+
   @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .animate-fade {
+    animation: fadeIn 0.7s ease-out forwards;
   }
 }
 
-.animate-fade {
-  animation: fadeIn 0.7s ease-out forwards;
-}
+/* GLOBAL RESPONSIVE CONTAINER FOR ALL PAGES */
+.global-container {
+  @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+/* UNIVERSAL RESPONSIVE GRID */
+.responsive-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* MOBILE-FRIENDLY TABLES (FOR ADMIN) */
+.table-wrapper {
+  @apply w-full overflow-x-auto;
+}
+
+.table-base {
+  @apply w-full min-w-max text-sm;
+}
+
+/* HERO SYSTEM */
+.hero-section {
+  @apply relative w-full h-[70vh] sm:h-[80vh] overflow-hidden;
+}
+
+.hero-content {
+  @apply relative max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center;
+}
+
+/* BUTTON SYSTEM */
+.btn-primary {
+  @apply bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition w-fit;
+}
+
+.btn-outline {
+  @apply border border-blue-200 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition w-fit;
+}
+
+/* MODALS */
+.modal-container {
+  @apply fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4 z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-xl w-full max-w-md p-6;
+}

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "../supabaseClient";
 import { checkRateLimit } from "../utils/rateLimit";
-import { Briefcase, Users, Target, ArrowRight, Star, MessageCircle } from "lucide-react";
-import heroImg from "../assets/Workhard.jpeg";
+import { Users, Briefcase, Target, Star, MessageCircle, LineChart, BarChart2 } from "lucide-react";
+import heroVideo from "../assets/watercomplete.mp4";
 
 export default function WorkWithUs() {
 
@@ -78,32 +78,38 @@ export default function WorkWithUs() {
   return (
     <section className="bg-white text-gray-800">
 
-      {/* HERO */}
-      <div className="relative h-[60vh] w-full overflow-hidden">
-        <img
-          src={heroImg}
-          alt="Work With Us"
+      {/* HERO VIDEO */}
+      <div className="relative h-[70vh] md:h-[85vh] w-full overflow-hidden">
+        <video
+          src={heroVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-900/50 to-transparent"></div>
 
-        <div className="relative max-w-6xl mx-auto px-6 h-full flex items-center">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/85 via-blue-900/50 to-transparent" />
+
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="max-w-xl"
           >
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white">
-              Jobba med oss
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight">
+              Jobba som ekonomikonsult
             </h1>
-            <p className="mt-4 text-blue-100 text-lg max-w-xl">
-              Bli en del av NorthPath – och ta nästa steg i din karriär inom IT, ekonomi och verksamhetsutveckling.
+
+            <p className="mt-4 text-blue-100 text-base sm:text-lg max-w-xl">
+              Exklusiva uppdrag inom controlling, redovisning, finans och BI med trygghet, utveckling och
+              personlig rådgivning i centrum.
             </p>
 
             <button
               onClick={() => setShowCVModal(true)}
-              className="mt-6 bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="mt-6 bg-blue-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition w-fit"
             >
               Skicka ditt CV
             </button>
@@ -111,19 +117,31 @@ export default function WorkWithUs() {
         </div>
       </div>
 
-      {/* WHY JOIN US */}
+      {/* WHY NORTHPATH */}
       <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">Varför NorthPath?</h2>
-        <p className="text-gray-600 max-w-2xl mx-auto mb-12">
-          Vi erbjuder trygghet, utveckling och möjligheten att arbeta på Sveriges mest spännande företag.
-          Oavsett om du söker längre uppdrag, projekt eller en fast tjänst – matchar vi dig med rätt roll.
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">Varför välja NorthPath?</h2>
+        <p className="text-gray-600 max-w-3xl mx-auto mb-12">
+          Vi är specialiserade på kvalificerad ekonomikompetens. Hos oss får du inte bara ett uppdrag du får
+          en långsiktig partner som förstår din karriärresa inom finance.
         </p>
 
         <div className="grid md:grid-cols-3 gap-10">
-          {[ 
-            { icon: <Users size={40} className="text-blue-700" />, title: "Personlig kontakt", desc: "En dedikerad konsultchef som följer dig hela vägen." },
-            { icon: <Briefcase size={40} className="text-blue-700" />, title: "Trygga uppdrag", desc: "Långsiktiga roller inom etablerade bolag." },
-            { icon: <Target size={40} className="text-blue-700" />, title: "Rätt matchning", desc: "Vi fokuserar på både kompetens och kulturpassform." },
+          {[
+            {
+              icon: <Users size={40} className="text-blue-700" />,
+              title: "Ekonomer som stöttar ekonomer",
+              desc: "Du matchas av konsulter med branscherfarenhet inte generella rekryterare."
+            },
+            {
+              icon: <Briefcase size={40} className="text-blue-700" />,
+              title: "Kvalificerade uppdrag",
+              desc: "Controller, redovisning, FP&A, BI roller där du gör verklig skillnad."
+            },
+            {
+              icon: <Target size={40} className="text-blue-700" />,
+              title: "Snabb, träffsäker matchning",
+              desc: "Vi lär känna både dig och rollen så du hamnar rätt direkt."
+            }
           ].map((b, i) => (
             <motion.div
               key={i}
@@ -140,57 +158,80 @@ export default function WorkWithUs() {
         </div>
       </div>
 
-      {/* AREAS WE HIRE FOR */}
+      {/* COMPETENCE AREAS */}
       <div className="bg-blue-50 py-20">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-10">Kompetensområden</h2>
+          <h2 className="text-3xl font-bold mb-10">Kompetensområden vi söker</h2>
 
           <div className="grid md:grid-cols-3 gap-8 text-left">
-            {[
-              {
-                title: "IT & Tech",
-                list: ["Fullstack", "Backend", "DevOps", "Cloud", "Data & BI"]
-              },
-              {
-                title: "Ekonomi & finans",
-                list: ["Redovisning", "Controller", "Lön", "Ekonomiansvar"]
-              },
-              {
-                title: "Verksamhetsutveckling",
-                list: ["Projektledning", "Processutveckling", "Agil coachning"]
-              },
-            ].map((cat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.2 }}
-                className="bg-white p-8 rounded-xl shadow-sm"
-              >
-                <h3 className="text-2xl font-semibold text-blue-700 mb-4">{cat.title}</h3>
-                <ul className="text-gray-700 space-y-2">
-                  {cat.list.map((item, index) => (
-                    <li key={index}>• {item}</li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
+
+            {/* FINANCE */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+              className="bg-white p-8 rounded-xl shadow-sm"
+            >
+              <h3 className="text-2xl font-semibold text-blue-700 mb-4">Ekonomi & Finans</h3>
+              <ul className="text-gray-700 space-y-2">
+                <li>• Business Controller</li>
+                <li>• Financial Controller</li>
+                <li>• Redovisningsekonom</li>
+                <li>• Ekonomiansvarig</li>
+                <li>• Lön / Payroll</li>
+              </ul>
+            </motion.div>
+
+            {/* ANALYTICS */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
+              className="bg-white p-8 rounded-xl shadow-sm"
+            >
+              <h3 className="text-2xl font-semibold text-blue-700 mb-4">Analys & BI</h3>
+              <ul className="text-gray-700 space-y-2">
+                <li>• BI Analyst</li>
+                <li>• PowerBI / Excel specialists</li>
+                <li>• Finansiell analys</li>
+                <li>• Budget & Forecasting</li>
+                <li>• KPI/Performance-analys</li>
+              </ul>
+            </motion.div>
+
+            {/* LEADERSHIP */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="bg-white p-8 rounded-xl shadow-sm"
+            >
+              <h3 className="text-2xl font-semibold text-blue-700 mb-4">Ledarskap & utveckling</h3>
+              <ul className="text-gray-700 space-y-2">
+                <li>• Teamlead ekonomi</li>
+                <li>• CFO-support</li>
+                <li>• Interim ekonomichef</li>
+                <li>• Processutveckling</li>
+                <li>• Modernisering av ekonomifunktioner</li>
+              </ul>
+            </motion.div>
+
           </div>
         </div>
       </div>
 
       {/* BENEFITS */}
       <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-8">Fördelar med att vara konsult hos oss</h2>
+        <h2 className="text-3xl font-bold mb-8">Vad du får som konsult hos oss</h2>
 
         <div className="grid md:grid-cols-3 gap-10">
           {[
-            "Trygga uppdrag hos stora företag",
-            "Flexibilitet och möjlighet till distansarbete",
+            "Trygga uppdrag på välrenommerade bolag",
             "Konkurrenskraftig ersättning",
-            "Stark konsultgemenskap",
-            "Kompetensutveckling",
-            "Möjlighet till fast anställning hos kund",
+            "Personlig konsultchef med ekonomi-bakgrund",
+            "Stöd inför månadsbokslut & budgetprocesser",
+            "Utvecklingsplan mot senior eller specialist",
+            "Möjlighet till fast roll hos kund"
           ].map((item, i) => (
             <motion.div
               key={i}
@@ -209,19 +250,19 @@ export default function WorkWithUs() {
       {/* TESTIMONIALS */}
       <div className="bg-blue-50 py-20">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-12">Vad konsulter säger</h2>
+          <h2 className="text-3xl font-bold mb-12">Vad våra konsulter säger</h2>
 
           <div className="grid md:grid-cols-2 gap-12">
             {[
               {
                 quote:
-                  "NorthPath gav mig möjligheten att växa snabbt och ta större ansvar i min roll som controller.",
-                name: "Sara – Ekonomikonsult",
+                  "Jag matchades direkt med ett Business Controller-uppdrag där jag fick fullt stöd från NorthPath inför första månadsbokslutet.",
+                name: "Sara – Business Controller",
               },
               {
                 quote:
-                  "Professionellt, tryggt och flexibelt. Jag har alltid känt mig stöttad.",
-                name: "Adam – IT-konsult",
+                  "NorthPath gav mig möjligheten att kliva in som interim-ekonomichef i ett bolag i stark tillväxt. Professionellt och personligt.",
+                name: "Adam – Interim Ekonomichef",
               },
             ].map((t, i) => (
               <motion.div
@@ -247,9 +288,9 @@ export default function WorkWithUs() {
         <div className="grid md:grid-cols-4 gap-10 text-center">
           {[
             "Skicka CV",
-            "Matchning & screening",
-            "Intervju",
-            "Starta uppdrag",
+            "Kompetenskartläggning & matchning",
+            "Intervju hos kund",
+            "Uppstart med onboarding & stöd"
           ].map((step, i) => (
             <motion.div
               key={i}
@@ -267,56 +308,13 @@ export default function WorkWithUs() {
         </div>
       </div>
 
-      {/* FAQ */}
-      <div className="bg-blue-50 py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-10">
-            Vanliga frågor
-          </h2>
-
-          <div className="space-y-6">
-            {[
-              {
-                q: "Behöver jag erfarenhet?",
-                a: "Vi matchar både juniora och seniora profiler med rätt uppdrag.",
-              },
-              {
-                q: "Hur ofta får jag återkoppling?",
-                a: "Vi återkommer vanligtvis inom 24 timmar.",
-              },
-              {
-                q: "Hur fungerar anställningen?",
-                a: "Du kan vara anställd hos NorthPath eller direkt hos kund, beroende på uppdrag.",
-              },
-              {
-                q: "Kan jag jobba på distans?",
-                a: "Många uppdrag erbjuder hybrid- eller distansmöjligheter.",
-              },
-            ].map((f, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="bg-white p-6 rounded-xl shadow"
-              >
-                <h3 className="text-xl font-semibold text-blue-700 mb-2">
-                  {f.q}
-                </h3>
-                <p className="text-gray-700">{f.a}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* CTA */}
       <div className="py-20 text-center bg-blue-950 text-white">
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Är du redo att ta nästa steg i din karriär?
+          Ta nästa steg i din ekonomi-karriär
         </h2>
         <p className="text-blue-200 mb-8">
-          Skicka in ditt CV eller boka ett samtal — så hjälper vi dig vidare.
+          Skicka in ditt CV eller boka ett samtal så hjälper vi dig vidare mot ditt nästa uppdrag.
         </p>
 
         <button

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
-import heroFallback from "../assets/office.webp";
+import heroFallback from "../assets/office.webp"; // byt till mer finance/corporate bild
 
 export default function Hero() {
   const [showModal, setShowModal] = useState(false);
@@ -24,7 +24,6 @@ export default function Hero() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!file) {
       setMessage("Välj en fil innan du laddar upp.");
       return;
@@ -47,15 +46,9 @@ export default function Hero() {
 
       const fileUrl = publicData?.publicUrl;
 
-      const { error: insertError } = await supabase.from("applications").insert([
-        {
-          name: formData.name,
-          email: formData.email,
-          linkedin: formData.linkedin,
-          about: formData.about,
-          file_url: fileUrl,
-        },
-      ]);
+      const { error: insertError } = await supabase
+        .from("applications")
+        .insert([{ ...formData, file_url: fileUrl }]);
 
       if (insertError) throw insertError;
 
@@ -65,7 +58,6 @@ export default function Hero() {
 
       setTimeout(() => setShowModal(false), 1500);
     } catch (err) {
-      console.error(err);
       setMessage("Ett fel uppstod. Försök igen.");
     } finally {
       setLoading(false);
@@ -75,14 +67,14 @@ export default function Hero() {
   return (
     <section className="relative h-[80vh] w-full overflow-hidden">
 
-      {/* FALLBACK IMAGE (under videon) */}
+      {/* STILLBILD UNDER VIDEON */}
       <img
         src={heroFallback}
-        alt="NorthPath Consulting"
+        alt="North Path Consulting"
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* VIDEO ALWAYS ACTIVE */}
+      {/* VIDEO (byt gärna till finance/corporate video) */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
         autoPlay
@@ -94,42 +86,39 @@ export default function Hero() {
         <source src="/video/office.mp4" type="video/mp4" />
       </video>
 
-      {/* UNIFIED GRADIENT (works on ALL screen sizes) */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-900/40 to-transparent"></div>
+      {/* GRADIENT */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/85 via-blue-900/50 to-transparent"></div>
 
       {/* CONTENT */}
-      <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col justify-center gap-10 md:flex-row md:items-center">
+      <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col justify-center md:items-start items-center">
 
-        {/* LEFT TEXT */}
-        <div className="flex-1 text-center md:text-left animate-fade">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight text-white">
-            Hyr rätt kompetens.
-            <span className="block text-blue-300">
-              Bygg framtidens organisation.
-            </span>
+        {/* TEXT - ENLIGT KUNDENS COPY */}
+        <div className="max-w-2xl text-center md:text-left text-white">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight">
+            Vi stärker företag<br />
+            <span className="text-blue-300">med rätt ekonomisk kompetens.</span>
           </h1>
 
-          <p className="mt-6 text-lg max-w-xl text-blue-100">
-            North Path Consulting hjälper företag växa genom smarta, hållbara och
-            flexibla konsult- och rekryteringslösningar inom IT, ekonomi och
-            verksamhetsutveckling.
+          <p className="mt-6 text-lg text-blue-100 leading-relaxed">
+            På North Path Consulting erbjuder vi kvalificerade och välrenommerade ekonomer 
+            som skapar värde. Rätt ekonom till rätt uppdrag – interim, projekt eller rekrytering.
           </p>
 
-          {/* CTA BUTTONS */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 md:justify-start justify-center">
-
+          {/* CTA FÖR FÖRETAG */}
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <a
               href="/contact"
               className="bg-blue-700 text-white px-8 py-4 rounded-lg shadow-md hover:bg-blue-800 transition font-medium text-lg"
             >
-              Boka ett möte
+              Kontakta oss
             </a>
 
+            {/* CV-FUNKTION FÖR KONSULTER – men sekundärt */}
             <button
               onClick={() => setShowModal(true)}
               className="border border-blue-200 text-blue-100 bg-transparent px-8 py-4 rounded-lg hover:bg-blue-800/40 transition font-medium text-lg"
             >
-              Ladda upp ditt CV
+              Registrera dig som konsult
             </button>
           </div>
         </div>
@@ -147,7 +136,7 @@ export default function Hero() {
             </button>
 
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Ladda upp ditt CV
+              Registrera dig som konsult
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
