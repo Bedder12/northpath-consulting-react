@@ -36,7 +36,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     load();
 
-    // Listen for auth state changes
+    // Small delay to avoid Chrome timing issues
+    setTimeout(() => {}, 30);
+
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
@@ -55,10 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // FIXED CLEANUP
-    return () => {
-      listener?.subscription?.unsubscribe?.();
-    };
+    return () => listener?.subscription?.unsubscribe?.();
   }, []);
 
   const logout = async () => {
