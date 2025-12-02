@@ -12,25 +12,45 @@ export default function Navbar() {
   // Load session + check if admin
   useEffect(() => {
     const loadSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+
+      // 🔍 1. Kolla session
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+
+      console.log("SESSION:", session); // <-- Viktig logg
       setSession(session);
 
-      if (session?.user?.email) {
-        const { data: allowed } = await supabase
-          .from("allowed_admins")
-          .select("*")
-          .eq("email", session.user.email)
-          .single();
-
-        setIsAdmin(!!allowed);
-      } else {
+      if (!session?.user?.email) {
+        console.log("Ingen session → användaren är inte inloggad.");
         setIsAdmin(false);
+        return;
       }
+
+      const email = session.user.email;
+      console.log("Inloggad som:", email);
+
+      // 🔍 2. Kolla om användaren ligger i allowed_admins
+      const { data: allowed, error } = await supabase
+        .from("allowed_admins")
+        .select("email")
+        .eq("email", email)
+        .maybeSingle();
+
+      console.log("ADMIN CHECK — DATA:", allowed);     // <-- Viktig logg
+      console.log("ADMIN CHECK — ERROR:", error);       // <-- Indicera 406 här
+
+      // Om Supabase returnerar error → Ingen admin
+      if (error) {
+        setIsAdmin(false);
+        return;
+      }
+
+      setIsAdmin(!!allowed);
     };
 
     loadSession();
 
-    // Listen for changes (login/logout)
+    // Lyssna på login/logout events
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
       loadSession();
     });
@@ -59,16 +79,8 @@ export default function Navbar() {
             <Link to="/" className="text-gray-700 hover:text-blue-600">Hem</Link>
             <Link to="/about" className="text-gray-700 hover:text-blue-600">Om oss</Link>
             <Link to="/services" className="text-gray-700 hover:text-blue-600">Tjänster</Link>
-
-            {/* Jobba med oss */}
-            <Link to="/work-with-us" className="text-gray-700 hover:text-blue-600">
-              Jobba med oss
-            </Link>
-
-            {/* För företag */}
-            <Link to="/for-companies" className="text-gray-700 hover:text-blue-600">
-              För företag
-            </Link>
+            <Link to="/work-with-us" className="text-gray-700 hover:text-blue-600">Jobba med oss</Link>
+            <Link to="/for-companies" className="text-gray-700 hover:text-blue-600">För företag</Link>
 
             {/* Admin */}
             {isAdmin ? (
@@ -81,7 +93,7 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Logout button */}
+            {/* Logout */}
             {session && (
               <button
                 onClick={handleLogout}
@@ -107,51 +119,26 @@ export default function Navbar() {
         <div className="sm:hidden bg-white border-t border-gray-200 shadow-md">
           <div className="px-4 py-4 space-y-2">
 
-            <Link to="/" onClick={() => setMenuOpen(false)} className="block">
-              Hem
-            </Link>
-
-            <Link to="/about" onClick={() => setMenuOpen(false)} className="block">
-              Om oss
-            </Link>
-
-            <Link to="/services" onClick={() => setMenuOpen(false)} className="block">
-              Tjänster
-            </Link>
-
-            <Link to="/work-with-us" onClick={() => setMenuOpen(false)} className="block">
-              Jobba med oss
-            </Link>
-
-            <Link to="/for-companies" onClick={() => setMenuOpen(false)} className="block">
-              För företag
-            </Link>
+            <Link to="/" onClick={() => setMenuOpen(false)}>Hem</Link>
+            <Link to="/about" onClick={() => setMenuOpen(false)}>Om oss</Link>
+            <Link to="/services" onClick={() => setMenuOpen(false)}>Tjänster</Link>
+            <Link to="/work-with-us" onClick={() => setMenuOpen(false)}>Jobba med oss</Link>
+            <Link to="/for-companies" onClick={() => setMenuOpen(false)}>För företag</Link>
 
             {/* Admin link */}
             {isAdmin ? (
-              <Link
-                to="/admin/dashboard"
-                onClick={() => setMenuOpen(false)}
-                className="block text-blue-700 font-semibold"
-              >
+              <Link to="/admin/dashboard" className="text-blue-700 font-semibold" onClick={() => setMenuOpen(false)}>
                 Adminpanel
               </Link>
             ) : (
-              <Link
-                to="/admin/login"
-                onClick={() => setMenuOpen(false)}
-                className="block text-gray-700 hover:text-blue-600"
-              >
+              <Link to="/admin/login" className="text-gray-700 hover:text-blue-600" onClick={() => setMenuOpen(false)}>
                 Admin
               </Link>
             )}
 
             {/* Logout */}
             {session && (
-              <button
-                onClick={handleLogout}
-                className="block text-left text-red-600 font-medium mt-3"
-              >
+              <button onClick={handleLogout} className="text-red-600 font-medium mt-3">
                 Logga ut
               </button>
             )}
