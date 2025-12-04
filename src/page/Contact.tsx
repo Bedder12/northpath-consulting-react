@@ -56,7 +56,7 @@ export default function Contact() {
 
       setSuccess("Tack! Vi hör av oss inom 24 timmar.");
       setFormData({ name: "", email: "", company: "", message: "" });
-    } catch (err) {
+    } catch {
       setError("Ett fel uppstod. Försök igen senare.");
     } finally {
       setSending(false);
@@ -100,7 +100,7 @@ export default function Contact() {
       setUploadMsg("CV uppladdat! Vi hör av oss snart.");
       setCvData({ name: "", email: "", linkedin: "", about: "" });
       setFile(null);
-    } catch (err) {
+    } catch {
       setUploadMsg("Fel vid uppladdning. Försök igen.");
     }
   };
@@ -108,64 +108,60 @@ export default function Contact() {
   return (
     <section className="bg-white min-h-screen py-16 px-4 sm:px-6">
 
-      {/* TITLE SECTION */}
+      {/* TITLE */}
       <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
           Kontakta oss
         </h1>
-        <p className="text-gray-600 text-lg mt-4 max-w-2xl mx-auto">
-          Oavsett om du är ett företag som söker kompetens eller en kandidat som vill växa – vi finns här för att hjälpa dig vidare.
+        <p className="text-gray-600 text-base sm:text-lg mt-4 max-w-2xl mx-auto">
+          Oavsett om du är ett företag som söker kompetens eller en kandidat som vill växa – vi hjälper dig vidare.
         </p>
       </div>
 
-      {/* CONTACT INFO BOXES */}
-      <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6 mb-16">
-        <div className="bg-blue-50 p-6 rounded-xl text-center shadow-sm">
-          <Phone className="mx-auto text-blue-700 mb-3" size={32} />
-          <p className="font-semibold text-gray-900">Telefon</p>
-          <p className="text-gray-700 text-sm mt-1">+46 (0)70 123 45 67</p>
-        </div>
-
-        <div className="bg-blue-50 p-6 rounded-xl text-center shadow-sm">
-          <Mail className="mx-auto text-blue-700 mb-3" size={32} />
-          <p className="font-semibold text-gray-900">E-post</p>
-          <p className="text-gray-700 text-sm mt-1">info@northpath.se</p>
-        </div>
-
-        <div className="bg-blue-50 p-6 rounded-xl text-center shadow-sm">
-          <Building2 className="mx-auto text-blue-700 mb-3" size={32} />
-          <p className="font-semibold text-gray-900">Företag</p>
-          <p className="text-gray-700 text-sm mt-1">
-            Stockholm • Remote
-          </p>
-        </div>
+      {/* CONTACT INFO */}
+      <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-16">
+        <ContactCard
+          icon={<Phone size={32} className="mx-auto text-blue-700" />}
+          title="Telefon"
+          text="+46 (0)70 123 45 67"
+        />
+        <ContactCard
+          icon={<Mail size={32} className="mx-auto text-blue-700" />}
+          title="E-post"
+          text="info@northpath.se"
+        />
+        <ContactCard
+          icon={<Building2 size={32} className="mx-auto text-blue-700" />}
+          title="Företag"
+          text="Stockholm • Remote"
+        />
       </div>
 
-      {/* MAIN CONTACT + CV CTA */}
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-start">
+      {/* FORM SECTION */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
 
-        {/* LEFT — CTA & TEXT */}
+        {/* LEFT CTA */}
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
             För företag & kandidater
           </h2>
           <p className="text-gray-600 mb-6 max-w-md">
-            Vi svarar vanligtvis inom 24 timmar. Berätta kort vad du behöver så återkommer vi med nästa steg.
+            Vi svarar vanligtvis inom 24 timmar. Berätta kort vad du behöver.
           </p>
 
           <button
             onClick={() => setShowCVModal(true)}
-            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition"
+            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition w-full sm:w-auto"
           >
             Skicka din ansökan
             <ArrowRight size={20} />
           </button>
         </div>
 
-        {/* RIGHT — CONTACT FORM */}
+        {/* RIGHT FORM */}
         <form
           onSubmit={handleSubmit}
-          className="bg-blue-950 text-white rounded-xl p-8 shadow-xl space-y-4"
+          className="bg-blue-950 text-white rounded-xl p-6 sm:p-8 shadow-xl space-y-4"
         >
           <input
             type="text"
@@ -199,7 +195,7 @@ export default function Contact() {
           <button
             type="submit"
             disabled={sending}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition w-full"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition w-full"
           >
             {sending ? "Skickar..." : "Skicka meddelande"}
           </button>
@@ -211,8 +207,8 @@ export default function Contact() {
 
       {/* CV MODAL */}
       {showCVModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-5 sm:p-6 relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setShowCVModal(false)}
               className="absolute top-3 right-3 text-gray-500 text-xl"
@@ -220,7 +216,7 @@ export default function Contact() {
               ×
             </button>
 
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+            <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4">
               Ladda upp ditt CV
             </h3>
 
@@ -228,7 +224,7 @@ export default function Contact() {
               <input
                 type="text"
                 name="name"
-                placeholder="Namn"
+                placeholder="Namn*"
                 value={cvData.name}
                 onChange={handleCvChange}
                 required
@@ -238,7 +234,7 @@ export default function Contact() {
               <input
                 type="email"
                 name="email"
-                placeholder="E-post"
+                placeholder="E-post*"
                 value={cvData.email}
                 onChange={handleCvChange}
                 required
@@ -263,7 +259,7 @@ export default function Contact() {
 
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded-md"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold"
               >
                 Skicka CV
               </button>
@@ -276,5 +272,24 @@ export default function Contact() {
         </div>
       )}
     </section>
+  );
+}
+
+/* SMALL CARD COMPONENT */
+function ContactCard({
+  icon,
+  title,
+  text,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="bg-blue-50 p-6 rounded-xl text-center shadow-sm hover:shadow-md transition">
+      {icon}
+      <p className="font-semibold text-gray-900 mt-3">{title}</p>
+      <p className="text-gray-700 text-sm mt-1">{text}</p>
+    </div>
   );
 }
