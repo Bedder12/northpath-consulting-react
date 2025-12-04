@@ -8,20 +8,22 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { session, isAdmin, logout } = useAuth();
 
-  // Prevent body scrolling when mobile menu is open
+  // Disable scroll when menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "auto";
   }, [menuOpen]);
 
   return (
-    <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
+    <nav className="bg-white shadow-sm fixed w-full top-0 z-[100]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
 
           {/* LOGO */}
           <Link 
             to="/" 
-            className="text-blue-600 font-bold text-xl whitespace-nowrap">
+            className="text-blue-600 font-bold text-xl whitespace-nowrap"
+            onClick={() => setMenuOpen(false)}
+          >
             NorthPath Consulting
           </Link>
 
@@ -56,48 +58,50 @@ export default function Navbar() {
           {/* MOBILE BUTTON */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="sm:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-md focus:outline-none"
+            className="sm:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-md"
           >
             {menuOpen ? <X size={26} /> : <Menu size={26} />}
           </button>
         </div>
       </div>
 
-      {/* MOBILE OVERLAY BACKDROP */}
- {menuOpen && (
-  <div
-    className="fixed inset-0 bg-black/40 sm:hidden z-40"
-    onClick={() => setMenuOpen(false)}
-  />
-)}
+      {/* ===== OVERLAY (UNDER NAVBAR) ===== */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 sm:hidden z-[90]"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
 
-
-      {/* MOBILE MENU (SLIDE-DOWN) */}
+      {/* ===== MOBILE MENU ===== */}
       <div
-        className={`sm:hidden bg-white shadow-lg transform transition-all duration-300 origin-top z-50
-        ${menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 overflow-hidden"}`}
+        className={`
+          fixed top-16 left-0 w-full bg-white shadow-lg sm:hidden z-[100]
+          transform transition-all duration-300 origin-top
+          ${menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 overflow-hidden"}
+        `}
       >
         <div className="px-6 py-5 space-y-4 text-lg">
 
-          <MobileItem to="/" setMenuOpen={setMenuOpen}>Hem</MobileItem>
-          <MobileItem to="/about" setMenuOpen={setMenuOpen}>Om oss</MobileItem>
-          <MobileItem to="/services" setMenuOpen={setMenuOpen}>Tjänster</MobileItem>
-          <MobileItem to="/work-with-us" setMenuOpen={setMenuOpen}>Jobba med oss</MobileItem>
-          <MobileItem to="/for-companies" setMenuOpen={setMenuOpen}>För företag</MobileItem>
+          <MobileItem to="/" close={setMenuOpen}>Hem</MobileItem>
+          <MobileItem to="/about" close={setMenuOpen}>Om oss</MobileItem>
+          <MobileItem to="/services" close={setMenuOpen}>Tjänster</MobileItem>
+          <MobileItem to="/work-with-us" close={setMenuOpen}>Jobba med oss</MobileItem>
+          <MobileItem to="/for-companies" close={setMenuOpen}>För företag</MobileItem>
 
           {/* Admin */}
           {isAdmin ? (
-            <MobileItem
+            <MobileItem 
               to="/admin/dashboard"
-              setMenuOpen={setMenuOpen}
+              close={setMenuOpen}
               className="text-blue-700 font-semibold"
             >
               Adminpanel
             </MobileItem>
           ) : (
-            <MobileItem
+            <MobileItem 
               to="/admin/login"
-              setMenuOpen={setMenuOpen}
+              close={setMenuOpen}
               className="text-gray-700"
             >
               Admin
@@ -106,7 +110,10 @@ export default function Navbar() {
 
           {session && (
             <button
-              onClick={logout}
+              onClick={() => {
+                logout();
+                setMenuOpen(false);
+              }}
               className="text-red-600 font-medium w-full text-left pt-2"
             >
               Logga ut
@@ -121,19 +128,19 @@ export default function Navbar() {
 /* ----- MOBILE MENU ITEM COMPONENT ----- */
 function MobileItem({
   to,
-  setMenuOpen,
+  close,
   children,
   className = "",
 }: {
   to: string;
-  setMenuOpen: (open: boolean) => void;
+  close: (open: boolean) => void;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
     <Link
       to={to}
-      onClick={() => setMenuOpen(false)}
+      onClick={() => close(false)}
       className={`block text-gray-700 hover:text-blue-600 text-lg font-medium ${className}`}
     >
       {children}
