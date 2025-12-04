@@ -64,12 +64,13 @@ export default function Navbar() {
       </div>
 
       {/* MOBILE OVERLAY BACKDROP */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm sm:hidden z-40"
-          onClick={() => setMenuOpen(false)}
-        />
-      )}
+ {menuOpen && (
+  <div
+    className="fixed inset-0 bg-black/40 sm:hidden z-40"
+    onClick={() => setMenuOpen(false)}
+  />
+)}
+
 
       {/* MOBILE MENU (SLIDE-DOWN) */}
       <div
