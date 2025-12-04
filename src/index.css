@@ -89,3 +89,10 @@
 .modal-content {
   @apply bg-white rounded-xl w-full max-w-md p-6;
 }
+
+.nav-link {
+  @apply text-gray-700 hover:text-blue-600 transition font-medium;
+}
+.nav-link-active {
+  @apply text-blue-600 font-semibold;
+}

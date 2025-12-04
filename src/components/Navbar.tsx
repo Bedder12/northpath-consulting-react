@@ -1,13 +1,17 @@
 // src/components/Navbar.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "../auth/useAuth";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-
   const { session, isAdmin, logout } = useAuth();
+
+  // Prevent body scrolling when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "auto";
+  }, [menuOpen]);
 
   return (
     <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
@@ -15,18 +19,20 @@ export default function Navbar() {
         <div className="flex justify-between h-16 items-center">
 
           {/* LOGO */}
-          <Link to="/" className="text-blue-600 font-bold text-xl">
+          <Link 
+            to="/" 
+            className="text-blue-600 font-bold text-xl whitespace-nowrap">
             NorthPath Consulting
           </Link>
 
           {/* DESKTOP MENU */}
           <div className="hidden sm:flex space-x-8 items-center">
 
-            <Link to="/" className="text-gray-700 hover:text-blue-600">Hem</Link>
-            <Link to="/about" className="text-gray-700 hover:text-blue-600">Om oss</Link>
-            <Link to="/services" className="text-gray-700 hover:text-blue-600">Tjänster</Link>
-            <Link to="/work-with-us" className="text-gray-700 hover:text-blue-600">Jobba med oss</Link>
-            <Link to="/for-companies" className="text-gray-700 hover:text-blue-600">För företag</Link>
+            <Link to="/" className="nav-link">Hem</Link>
+            <Link to="/about" className="nav-link">Om oss</Link>
+            <Link to="/services" className="nav-link">Tjänster</Link>
+            <Link to="/work-with-us" className="nav-link">Jobba med oss</Link>
+            <Link to="/for-companies" className="nav-link">För företag</Link>
 
             {/* Admin link */}
             {isAdmin ? (
@@ -34,9 +40,7 @@ export default function Navbar() {
                 Adminpanel
               </Link>
             ) : (
-              <Link to="/admin/login" className="text-gray-700 hover:text-blue-600">
-                Admin
-              </Link>
+              <Link to="/admin/login" className="nav-link">Admin</Link>
             )}
 
             {session && (
@@ -49,55 +53,89 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* MOBILE MENU BUTTON */}
+          {/* MOBILE BUTTON */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="sm:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
+            className="sm:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-md focus:outline-none"
           >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+            {menuOpen ? <X size={26} /> : <Menu size={26} />}
           </button>
         </div>
       </div>
 
-      {/* MOBILE MENU */}
+      {/* MOBILE OVERLAY BACKDROP */}
       {menuOpen && (
-        <div className="sm:hidden bg-white border-t border-gray-200 shadow-md">
-          <div className="px-4 py-4 space-y-2">
-
-            <Link to="/" onClick={() => setMenuOpen(false)}>Hem</Link>
-            <Link to="/about" onClick={() => setMenuOpen(false)}>Om oss</Link>
-            <Link to="/services" onClick={() => setMenuOpen(false)}>Tjänster</Link>
-            <Link to="/work-with-us" onClick={() => setMenuOpen(false)}>Jobba med oss</Link>
-            <Link to="/for-companies" onClick={() => setMenuOpen(false)}>För företag</Link>
-
-            {/* Admin */}
-            {isAdmin ? (
-              <Link
-                to="/admin/dashboard"
-                className="text-blue-700 font-semibold"
-                onClick={() => setMenuOpen(false)}
-              >
-                Adminpanel
-              </Link>
-            ) : (
-              <Link
-                to="/admin/login"
-                className="text-gray-700 hover:text-blue-600"
-                onClick={() => setMenuOpen(false)}
-              >
-                Admin
-              </Link>
-            )}
-
-            {session && (
-              <button onClick={logout} className="text-red-600 font-medium mt-3">
-                Logga ut
-              </button>
-            )}
-
-          </div>
-        </div>
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm sm:hidden z-40"
+          onClick={() => setMenuOpen(false)}
+        />
       )}
+
+      {/* MOBILE MENU (SLIDE-DOWN) */}
+      <div
+        className={`sm:hidden bg-white shadow-lg transform transition-all duration-300 origin-top z-50
+        ${menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 overflow-hidden"}`}
+      >
+        <div className="px-6 py-5 space-y-4 text-lg">
+
+          <MobileItem to="/" setMenuOpen={setMenuOpen}>Hem</MobileItem>
+          <MobileItem to="/about" setMenuOpen={setMenuOpen}>Om oss</MobileItem>
+          <MobileItem to="/services" setMenuOpen={setMenuOpen}>Tjänster</MobileItem>
+          <MobileItem to="/work-with-us" setMenuOpen={setMenuOpen}>Jobba med oss</MobileItem>
+          <MobileItem to="/for-companies" setMenuOpen={setMenuOpen}>För företag</MobileItem>
+
+          {/* Admin */}
+          {isAdmin ? (
+            <MobileItem
+              to="/admin/dashboard"
+              setMenuOpen={setMenuOpen}
+              className="text-blue-700 font-semibold"
+            >
+              Adminpanel
+            </MobileItem>
+          ) : (
+            <MobileItem
+              to="/admin/login"
+              setMenuOpen={setMenuOpen}
+              className="text-gray-700"
+            >
+              Admin
+            </MobileItem>
+          )}
+
+          {session && (
+            <button
+              onClick={logout}
+              className="text-red-600 font-medium w-full text-left pt-2"
+            >
+              Logga ut
+            </button>
+          )}
+        </div>
+      </div>
     </nav>
+  );
+}
+
+/* ----- MOBILE MENU ITEM COMPONENT ----- */
+function MobileItem({
+  to,
+  setMenuOpen,
+  children,
+  className = "",
+}: {
+  to: string;
+  setMenuOpen: (open: boolean) => void;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Link
+      to={to}
+      onClick={() => setMenuOpen(false)}
+      className={`block text-gray-700 hover:text-blue-600 text-lg font-medium ${className}`}
+    >
+      {children}
+    </Link>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
-import heroFallback from "../assets/office.webp"; // byt till mer finance/corporate bild
+import heroFallback from "../assets/office.webp";
 
 export default function Hero() {
   const [showModal, setShowModal] = useState(false);
@@ -37,7 +37,6 @@ export default function Hero() {
       const { error: uploadError } = await supabase.storage
         .from("cvs")
         .upload(filePath, file);
-
       if (uploadError) throw uploadError;
 
       const { data: publicData } = supabase.storage
@@ -49,7 +48,6 @@ export default function Hero() {
       const { error: insertError } = await supabase
         .from("applications")
         .insert([{ ...formData, file_url: fileUrl }]);
-
       if (insertError) throw insertError;
 
       setMessage("Tack! Din ansökan har skickats.");
@@ -65,18 +63,18 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative h-[80vh] w-full overflow-hidden">
+    <section className="relative h-[75vh] sm:h-[80vh] w-full overflow-hidden">
 
-      {/* STILLBILD UNDER VIDEON */}
+      {/* ===== BACKGROUND FALLBACK IMAGE ===== */}
       <img
         src={heroFallback}
         alt="North Path Consulting"
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* VIDEO (byt gärna till finance/corporate video) */}
+      {/* ===== BACKGROUND VIDEO ===== */}
       <video
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover hidden sm:block"
         autoPlay
         muted
         loop
@@ -86,71 +84,122 @@ export default function Hero() {
         <source src="/video/office.mp4" type="video/mp4" />
       </video>
 
-      {/* GRADIENT */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/85 via-blue-900/50 to-transparent"></div>
+      {/* ===== DARK OVERLAY FOR CONTRAST (MOBILE-FRIENDLY) ===== */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-900/60 to-transparent"></div>
 
-      {/* CONTENT */}
-      <div className="relative max-w-7xl mx-auto px-6 h-full flex flex-col justify-center md:items-start items-center">
+      {/* ===== CONTENT ===== */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 h-full 
+                      flex flex-col justify-center items-center sm:items-start 
+                      text-center sm:text-left pt-10 sm:pt-0">
 
-        {/* TEXT - ENLIGT KUNDENS COPY */}
-        <div className="max-w-2xl text-center md:text-left text-white">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight">
+        <div className="max-w-2xl text-white">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight">
             Vi stärker företag<br />
-            <span className="text-blue-300">med rätt ekonomisk kompetens.</span>
+            <span className="text-blue-300">
+              med rätt ekonomisk kompetens.
+            </span>
           </h1>
 
-          <p className="mt-6 text-lg text-blue-100 leading-relaxed">
+          <p className="mt-4 sm:mt-6 text-base sm:text-lg text-blue-100 leading-relaxed">
             På North Path Consulting erbjuder vi kvalificerade och välrenommerade ekonomer 
             som skapar värde. Rätt ekonom till rätt uppdrag – interim, projekt eller rekrytering.
           </p>
 
-          {/* CTA FÖR FÖRETAG */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-4">
+          {/* CTA BUTTONS (stack on mobile) */}
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            
             <a
               href="/contact"
-              className="bg-blue-700 text-white px-8 py-4 rounded-lg shadow-md hover:bg-blue-800 transition font-medium text-lg"
+              className="bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md 
+                         hover:bg-blue-800 transition font-medium text-lg text-center"
             >
               Kontakta oss
             </a>
 
-            {/* CV-FUNKTION FÖR KONSULTER – men sekundärt */}
             <button
               onClick={() => setShowModal(true)}
-              className="border border-blue-200 text-blue-100 bg-transparent px-8 py-4 rounded-lg hover:bg-blue-800/40 transition font-medium text-lg"
+              className="border border-blue-200 text-blue-100 bg-transparent 
+                         px-6 py-3 rounded-lg hover:bg-blue-800/40 transition 
+                         font-medium text-lg text-center"
             >
               Registrera dig som konsult
             </button>
+
           </div>
         </div>
       </div>
 
-      {/* CV MODAL */}
+      {/* ===== MODAL ===== */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm 
+                        flex items-center justify-center z-50 px-4 py-6">
+          
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-4 sm:p-6 relative 
+                          max-h-[90vh] overflow-y-auto">
+            
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl"
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
             >
               ×
             </button>
 
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
               Registrera dig som konsult
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input type="text" name="name" placeholder="Namn" value={formData.name} onChange={handleChange} required className="w-full border rounded-md px-3 py-2" />
+              <input
+                type="text"
+                name="name"
+                placeholder="Namn"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-md px-3 py-2"
+              />
 
-              <input type="email" name="email" placeholder="E-post" value={formData.email} onChange={handleChange} required className="w-full border rounded-md px-3 py-2" />
+              <input
+                type="email"
+                name="email"
+                placeholder="E-post"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full border rounded-md px-3 py-2"
+              />
 
-              <input type="url" name="linkedin" placeholder="LinkedIn (valfritt)" value={formData.linkedin} onChange={handleChange} className="w-full border rounded-md px-3 py-2" />
+              <input
+                type="url"
+                name="linkedin"
+                placeholder="LinkedIn (valfritt)"
+                value={formData.linkedin}
+                onChange={handleChange}
+                className="w-full border rounded-md px-3 py-2"
+              />
 
-              <textarea name="about" placeholder="Kort beskrivning" value={formData.about} onChange={handleChange} className="w-full border rounded-md px-3 py-2 h-24"></textarea>
+              <textarea
+                name="about"
+                placeholder="Kort beskrivning"
+                value={formData.about}
+                onChange={handleChange}
+                className="w-full border rounded-md px-3 py-2 h-24"
+              />
 
-              <input type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange} required className="w-full border rounded-md px-3 py-2 cursor-pointer" />
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={handleFileChange}
+                required
+                className="w-full border rounded-md px-3 py-2 cursor-pointer"
+              />
 
-              <button type="submit" disabled={loading} className="w-full bg-blue-700 text-white py-3 rounded-lg hover:bg-blue-800 transition font-semibold">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-700 text-white py-3 rounded-lg 
+                           hover:bg-blue-800 transition font-semibold"
+              >
                 {loading ? "Skickar..." : "Skicka CV"}
               </button>
 
@@ -161,7 +210,6 @@ export default function Hero() {
           </div>
         </div>
       )}
-
     </section>
   );
 }

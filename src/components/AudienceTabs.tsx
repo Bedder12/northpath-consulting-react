@@ -23,7 +23,7 @@ const tabs: Tab[] = [
     label: "För Företag",
     heading: "Rätt ekonomisk kompetens när ni behöver den",
     text:
-      "På North Path Consulting vet vi att varje företag har unika behov. Därför skräddarsyr vi varje uppdrag och matchar er med kvalificerade ekonomer som har både rätt kompetens och förståelse för er verksamhet.",
+      "På North Path Consulting vet vi att varje företag har unika behov. Därför matchar vi er med kvalificerade ekonomer med branscherfarenhet och skräddarsydd kompetens.",
     image: kompetens,
   },
   {
@@ -31,7 +31,7 @@ const tabs: Tab[] = [
     label: "För Konsulter",
     heading: "Uppdrag som utvecklar er professionellt",
     text:
-      "Som konsult hos North Path får ni tillgång till kvalificerade uppdrag som stärker er karriär. Våra ekonomer har ofta akademiska meriter från ledande universitet och erfarenhet från nyckelroller inom näringslivet.",
+      "Som konsult hos oss får ni tillgång till kvalificerade uppdrag som stärker er karriär. Vi arbetar nära både kunder och konsulter för att säkerställa rätt matchning.",
     image: konsult,
   },
   {
@@ -39,7 +39,7 @@ const tabs: Tab[] = [
     label: "För Kandidater",
     heading: "Er karriärresa börjar här",
     text:
-      "Vi matchar er med uppdrag inom ekonomi där ni får möjlighet att växa och bidra med er kompetens – från första kontakt till första dagen på uppdraget.",
+      "Vi matchar er med utvecklande roller inom ekonomi där ni får möjlighet att växa och bidra med er kompetens – från första kontakt till första dagen på uppdraget.",
     image: student,
   },
 ];
@@ -50,7 +50,6 @@ export default function AudienceTabs() {
 
   const activeTab = tabs.find((t) => t.id === active)!;
 
-  // MAP TABS TO CORRECT "LÄS MER" DESTINATIONS
   const handleReadMore = () => {
     if (activeTab.id === "companies") navigate("/for-companies");
     if (activeTab.id === "consultants") navigate("/work-with-us");
@@ -58,12 +57,12 @@ export default function AudienceTabs() {
   };
 
   return (
-    <section className="bg-white py-20 border-t border-gray-100">
-      <div className="max-w-7xl mx-auto px-6 text-center">
+    <section className="bg-white py-16 sm:py-20 border-t border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
 
-        {/* SEGMENTED CONTROL TABS */}
-        <div className="flex justify-center mb-12 mt-4">
-          <div className="inline-flex rounded-md border border-blue-300 overflow-hidden shadow-sm">
+        {/* ======= SEGMENTED CONTROL (RESPONSIVE) ======= */}
+        <div className="flex justify-center mb-10">
+          <div className="inline-flex rounded-lg border border-blue-300 overflow-hidden shadow-sm w-full sm:w-auto">
             {tabs.map((tab, index) => {
               const isActive = active === tab.id;
 
@@ -72,7 +71,8 @@ export default function AudienceTabs() {
                   key={tab.id}
                   onClick={() => setActive(tab.id)}
                   className={`
-                    px-6 py-2 text-sm md:text-base font-semibold transition-all
+                    flex-1 sm:flex-none px-4 sm:px-6 py-2 text-sm sm:text-base font-medium
+                    transition-all whitespace-nowrap
                     ${isActive 
                       ? "bg-blue-600 text-white shadow" 
                       : "bg-white text-blue-600 hover:bg-blue-50"
@@ -87,39 +87,57 @@ export default function AudienceTabs() {
           </div>
         </div>
 
-        {/* MAIN CONTENT */}
+        {/* ======= ANIMATION & CONTENT ======= */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4 }}
-            className="grid md:grid-cols-2 gap-10 items-center text-left"
+            exit={{ opacity: 0, y: -25 }}
+            transition={{ duration: 0.35 }}
+            className="
+              grid 
+              grid-cols-1 md:grid-cols-2 
+              gap-10 md:gap-12 
+              items-center 
+              text-left
+            "
           >
-            {/* LEFT TEXT */}
+            {/* ===== LEFT TEXT ===== */}
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 {activeTab.heading}
               </h2>
 
-              <p className="text-lg text-gray-600 mb-6">{activeTab.text}</p>
+              <p className="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed">
+                {activeTab.text}
+              </p>
 
-              {/* CTA BUTTONS */}
+              {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
 
-                {/* PRIMARY – CONTACT */}
                 <button
                   onClick={() => navigate("/contact")}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition w-full sm:w-auto"
+                  className="
+                    bg-blue-600 text-white 
+                    px-6 py-3 
+                    rounded-md font-medium
+                    hover:bg-blue-700 transition
+                    w-full sm:w-auto
+                  "
                 >
                   Kontakta oss
                 </button>
 
-                {/* SECONDARY – READ MORE */}
                 <button
                   onClick={handleReadMore}
-                  className="border border-blue-300 text-blue-600 px-6 py-3 rounded-md font-medium hover:bg-blue-50 transition w-full sm:w-auto"
+                  className="
+                    border border-blue-300 text-blue-600 
+                    px-6 py-3 
+                    rounded-md font-medium
+                    hover:bg-blue-50 transition
+                    w-full sm:w-auto
+                  "
                 >
                   Läs mer
                 </button>
@@ -127,18 +145,16 @@ export default function AudienceTabs() {
               </div>
             </div>
 
-            {/* IMAGE */}
+            {/* ===== RIGHT IMAGE ===== */}
             <motion.div
               className="
                 w-full 
-                h-64 sm:h-72 md:h-80 lg:h-96 
-                overflow-hidden 
-                rounded-xl 
-                shadow-lg
+                h-56 sm:h-64 md:h-80 lg:h-96 
+                rounded-xl shadow-lg overflow-hidden
               "
               initial={{ scale: 0.98 }}
               animate={{ scale: 1 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.35 }}
             >
               <img
                 src={activeTab.image}
